@@ -1,0 +1,75 @@
+using UnityEngine;
+
+namespace DecentlyGoodStreetBuilder
+{
+	/// <summary>
+	/// Holds shared values between Nodes and Segments. 
+	/// </summary>
+	public abstract class StreetElement : ScriptableObject
+	{
+		private StreetBuilder myStreetBuilder;
+		public StreetBuilder MyStreetBuilder
+		{
+			get { return myStreetBuilder; }
+		}
+
+		private ElementGroup myElementGroup;
+		public StreetBuilder MyElementGroup
+		{
+			get { return myStreetBuilder; }
+		}
+
+		private Vector3 position;
+		public virtual Vector3 Position
+		{
+			get { return position; }
+			set { position = value; OnPositionChange(); }
+		}
+
+		/// <summary>
+		/// this is why we hate unity, the constructor cant be called if the class inharits ScriptableObject
+		/// </summary>
+		/// <param name="streetBuilder"></param>
+		/// <param name="elementGroup"></param>
+		public virtual void Init(StreetBuilder streetBuilder, ElementGroup elementGroup)
+		{
+			this.myStreetBuilder = streetBuilder;
+			this.myElementGroup = elementGroup;
+		}
+
+		/// <summary>
+		/// Used to draw to the editor scene. 
+		/// </summary>
+		/// <param name="isSelected"></param>
+		public abstract void Draw(bool isSelected);
+
+		/// <summary>
+		/// Called when position is set
+		/// </summary>
+		public virtual void OnPositionChange() { }
+
+		/// <summary>
+		/// makes the mesh Gameobject
+		/// </summary>
+		public void MakeGameObject()
+		{
+
+		}
+
+		/// <summary>
+		/// Moves this element to a new group. 
+		/// </summary>
+		/// <param name="newGroup"></param>
+		public void MoveGroups(ElementGroup newGroup)
+		{
+			myElementGroup.RemoveStreetElement(this);
+			newGroup.AddStreetElement(this);
+			myElementGroup = newGroup;
+		}
+
+		private void OnDestroy()
+		{
+			//tell my element group to remove me
+		}
+	}
+}

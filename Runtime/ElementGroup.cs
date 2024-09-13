@@ -8,7 +8,7 @@ namespace DecentlyGoodStreetBuilder
 	/// </summary>
 	public class ElementGroup : ScriptableObject
 	{
-		private List<StreetElement> streetElements;
+        [SerializeField] private List<StreetElement> streetElements;
 		public StreetElement this[int index]
 		{
 			get { return streetElements[index]; }
@@ -19,7 +19,7 @@ namespace DecentlyGoodStreetBuilder
 		}
 
 		/// <summary>
-		/// Should only be called from StreetElement.MoveGroups()
+		/// Should only be called from StreetElement.MoveGroups() and StreetElement.Init()
 		/// </summary>
 		public void AddStreetElement(StreetElement streetElement)
 		{
@@ -29,6 +29,7 @@ namespace DecentlyGoodStreetBuilder
 			}
 			else
 			{
+				if(streetElement)
 				streetElements.Add(streetElement);
 			}
 		}

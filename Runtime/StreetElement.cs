@@ -27,14 +27,21 @@ namespace DecentlyGoodStreetBuilder
 		}
 
 		/// <summary>
-		/// this is why we hate unity, the constructor cant be called if the class inharits ScriptableObject
+		/// constructorish
 		/// </summary>
 		/// <param name="streetBuilder"></param>
-		/// <param name="elementGroup"></param>
-		public virtual void Init(StreetBuilder streetBuilder, ElementGroup elementGroup)
+		/// <param name="elementGroup">null = default group</param>
+		public virtual void Init(StreetBuilder streetBuilder, ElementGroup elementGroup = null)
 		{
 			this.myStreetBuilder = streetBuilder;
-			this.myElementGroup = elementGroup;
+
+			if(elementGroup == null)
+			{
+                elementGroup = streetBuilder.DefaultGroup;
+            }
+            this.myElementGroup = elementGroup;
+
+            elementGroup.AddStreetElement(this);
 		}
 
 		/// <summary>

@@ -23,13 +23,17 @@ namespace DecentlyGoodStreetBuilder
 		{
 			get
 			{
-                ElementGroup group = groups[0];
+				ElementGroup group = null;
 
-                if (group == null)
+                if (groups.Count == 0 || groups[0].name != "Default")
                 {
                     group = new ElementGroup();
                     group.name = "Default";
                     groups.Insert(0, group);
+				}
+				else
+				{
+                    group = groups[0];
                 }
 
 				return group;

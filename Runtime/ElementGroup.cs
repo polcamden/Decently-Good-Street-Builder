@@ -8,7 +8,7 @@ namespace DecentlyGoodStreetBuilder
 	/// </summary>
 	public class ElementGroup : ScriptableObject
 	{
-        [SerializeField] private List<StreetElement> streetElements;
+        [SerializeField] private List<StreetElement> streetElements = new List<StreetElement>();
 		public StreetElement this[int index]
 		{
 			get { return streetElements[index]; }

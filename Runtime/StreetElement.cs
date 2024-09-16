@@ -7,19 +7,19 @@ namespace DecentlyGoodStreetBuilder
 	/// </summary>
 	public abstract class StreetElement : ScriptableObject
 	{
-		private StreetBuilder myStreetBuilder;
+		[SerializeField] private StreetBuilder myStreetBuilder;
 		public StreetBuilder MyStreetBuilder
 		{
 			get { return myStreetBuilder; }
 		}
 
-		private ElementGroup myElementGroup;
+		[SerializeField] private ElementGroup myElementGroup;
 		public StreetBuilder MyElementGroup
 		{
 			get { return myStreetBuilder; }
 		}
 
-		private Vector3 position;
+		[SerializeField] private Vector3 position;
 		public virtual Vector3 Position
 		{
 			get { return position; }

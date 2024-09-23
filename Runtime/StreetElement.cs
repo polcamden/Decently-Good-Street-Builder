@@ -53,8 +53,8 @@ namespace DecentlyGoodStreetBuilder
 		/// <summary>
 		/// Called to find if the element has been clicked on
 		/// </summary>
-		/// <returns></returns>
-		public abstract bool Selected();
+		/// <returns>returns the elements that should be selected</returns>
+		public abstract StreetElement[] Selected();
 
 		/// <summary>
 		/// Called when position is set

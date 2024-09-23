@@ -16,16 +16,6 @@ namespace DecentlyGoodStreetBuilder.Editor
 	{
 		public static StreetBuilder streetBuilder;
 
-		public override void OnActivated()
-		{
-			//Debug.Log("asd");
-		}
-
-		public override void OnWillBeDeactivated()
-		{
-			//Debug.Log("asd");
-		}
-
 		public static void AddNode()
 		{
             Node node = CreateInstance<Node>();
@@ -38,32 +28,14 @@ namespace DecentlyGoodStreetBuilder.Editor
 			Selection.objects = new UnityEngine.Object[] { ((StreetBuilder)target).gameObject };
 
 			streetBuilder = ((StreetBuilder)target).gameObject.GetComponent<StreetBuilder>();
-
-			//tool tips
-            if (Event.current.alt)
-            {
-                GenericMenu menu = new GenericMenu();
-
-                // Add menu items (name and callback method)
-                menu.AddItem(new GUIContent("Custom Action 1"), false, () => AddNode());
-
-                // Show the context menu
-                menu.ShowAsContext();
-
-                // Mark the event as used, so it doesn't propagate
-                Event.current.Use();
-            }
-
-			/*streetBuilder.ResetElementLoop();
-			StreetElement elem = streetBuilder.NextElement();
-			while (elem != null) {
-                elem.Draw(false);
-
-                elem = streetBuilder.NextElement();
-            }*/
         }
 
-		protected override Type GetEditorToolType(Tool tool)
+        public override void PopulateMenu(DropdownMenu menu)
+        {
+            menu.AppendAction("Create Node", (item) => AddNode());
+        }
+
+        protected override Type GetEditorToolType(Tool tool)
 		{
 			//Tool menu
 			switch (tool)
@@ -73,15 +45,6 @@ namespace DecentlyGoodStreetBuilder.Editor
 				default:
 					return null;
 			}
-		}
-	}
-
-	public class EditorModeMenuItems
-	{
-		
-		static void CreateNode()
-		{
-
 		}
 	}
 	
@@ -95,7 +58,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 			DoToSelected();
 
-            if ( Event.current.type == EventType.MouseDown)
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && Event.current.isMouse)
 			{
 				bool voidClick = true;
 
@@ -206,5 +169,30 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 			return true;
         }
+
+        public override void PopulateMenu(DropdownMenu menu)
+        {
+            menu.AppendSeparator();
+
+            if (selected.Count == 2)
+			{
+				menu.AppendAction("Connect", (item) => MeshConnect());
+			}
+			else if (selected.Count >= 3)
+			{
+                //menu.AppendAction("Mesh Connect", (item) => MeshConnect());
+            }
+        }
+
+		public void MeshConnect()
+		{
+			if(selected.Count == 2)
+			{
+				//bad cast just testing
+				Segment seg = ScriptableObject.CreateInstance<Segment>();
+
+				seg.Init((Node)selected[0], (Node)selected[1], selected[0].MyStreetBuilder, null);
+			}
+		}
     }
 }

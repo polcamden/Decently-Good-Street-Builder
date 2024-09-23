@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace DecentlyGoodStreetBuilder
@@ -7,6 +8,8 @@ namespace DecentlyGoodStreetBuilder
     {
         [SerializeField] private Node[] connection;
         [SerializeField] private Vector3 handle;
+
+        public override Vector3 Position { get => base.Position; set { } }
 
         /// <summary>
         /// Sets Group and links the segment to two nodes
@@ -59,10 +62,12 @@ namespace DecentlyGoodStreetBuilder
 
         public override void Draw(string[] args)
         {
-            
+            Handles.color = Color.black;
+
+            Handles.DrawLine(connection[0].Position, connection[1].Position, 3);
         }
 
-        public override bool Selected()
+        public override StreetElement[] Selected()
         {
             return false;
         }

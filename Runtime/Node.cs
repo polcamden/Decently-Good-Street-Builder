@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.MemoryProfiler;
@@ -25,7 +26,8 @@ namespace DecentlyGoodStreetBuilder
         }
 
 
-        const float HandleSize = 0.5f;
+        const float HANDLE_SIZE = 0.5f;
+        const float SELECTION_DISTANCE = 2f;
 
 
         public void Init(Vector3 position, StreetBuilder streetBuilder, ElementGroup elementGroup = null)
@@ -35,10 +37,29 @@ namespace DecentlyGoodStreetBuilder
             Position = position;
         }
 
-        public override void Draw(bool isSelected)
+        public override void Draw(string[] args)
         {
             Handles.color = Color.green;
-            Handles.SphereHandleCap(0, Position, Quaternion.identity, HandleSize, EventType.Repaint);
+
+            if (args.Contains<string>("selected"))
+            {
+                Handles.color = Color.red;
+            }
+
+            
+            Handles.SphereHandleCap(0, Position, Quaternion.identity, HANDLE_SIZE, EventType.Repaint);
+        }
+
+        public override bool Selected()
+        {
+            float cursorDistance = HandleUtility.DistanceToCircle(Position, HANDLE_SIZE);
+
+            if (SELECTION_DISTANCE > cursorDistance)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

@@ -48,7 +48,13 @@ namespace DecentlyGoodStreetBuilder
 		/// Used to draw to the editor scene. 
 		/// </summary>
 		/// <param name="isSelected"></param>
-		public abstract void Draw(bool isSelected);
+		public abstract void Draw(string[] args);
+
+		/// <summary>
+		/// Called to find if the element has been clicked on
+		/// </summary>
+		/// <returns></returns>
+		public abstract bool Selected();
 
 		/// <summary>
 		/// Called when position is set

@@ -40,6 +40,9 @@ namespace DecentlyGoodStreetBuilder
             }
 		}
 
+		private int groupIndex = 0;
+		private int elementIndex = 0;
+
 		/// <summary>
 		/// Creates a new ElementGroup and moves the StreetElements into it. 
 		/// </summary>
@@ -59,6 +62,40 @@ namespace DecentlyGoodStreetBuilder
 				}
 			}
 		}
+	
+		public void ResetElementLoop()
+		{
+            groupIndex = 0;
+            elementIndex = 0;
+        }
 
+        /// <summary>
+        /// Returns the next Element of the hierarchy. Call ResetElementLoop() before iterating on NextElement(). 
+        /// </summary>
+        /// <returns>Next Element of the hierarchy will return null at the end</returns>
+        public StreetElement NextElement()
+		{
+			StreetElement element = null;
+
+            if (groups.Count > groupIndex)
+			{
+                if (groups[groupIndex].Count > elementIndex)
+				{
+					element = groups[groupIndex][elementIndex];
+                    elementIndex++;
+                }
+				else
+				{
+					elementIndex = 0;
+					groupIndex++;
+                }
+			}
+			else
+			{
+				ResetElementLoop();
+            }
+
+			return element;
+		}
 	}
 }

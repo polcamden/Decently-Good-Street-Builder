@@ -57,9 +57,14 @@ namespace DecentlyGoodStreetBuilder
             DestroyImmediate(this);
         }
 
-        public override void Draw(bool isSelected)
+        public override void Draw(string[] args)
         {
             
+        }
+
+        public override bool Selected()
+        {
+            return false;
         }
 
         private void OnDestroy()

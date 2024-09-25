@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
+using DecentlyGoodStreetBuilder.NodeTypes;
 
 namespace DecentlyGoodStreetBuilder
 {
@@ -25,6 +24,11 @@ namespace DecentlyGoodStreetBuilder
             return connectionLinks[i];
         }
 
+        [SerializeField] private NodeType nodeType;
+        public NodeType NodeType
+        {
+            get { return nodeType; }
+        }
 
         const float HANDLE_SIZE = 0.5f;
         const float SELECTION_DISTANCE = 2f;
@@ -45,21 +49,27 @@ namespace DecentlyGoodStreetBuilder
             {
                 Handles.color = Color.red;
             }
-
             
             Handles.SphereHandleCap(0, Position, Quaternion.identity, HANDLE_SIZE, EventType.Repaint);
         }
 
-        public override bool Selected()
+        public override StreetElement[] Selected()
         {
             float cursorDistance = HandleUtility.DistanceToCircle(Position, HANDLE_SIZE);
 
             if (SELECTION_DISTANCE > cursorDistance)
             {
-                return true;
+                return new StreetElement[] { this };
             }
 
-            return false;
+            return null;
+        }
+
+        public override void OnPositionChange()
+        {
+            foreach (var segment in connectionLinks) { 
+                segment.ConnectionNodePositionUpdate();
+            }
         }
 
         /// <summary>
@@ -71,6 +81,8 @@ namespace DecentlyGoodStreetBuilder
         {
             connections.Add(node);
             connectionLinks.Add(link);
+
+
         }
     
         /// <summary>
@@ -83,6 +95,28 @@ namespace DecentlyGoodStreetBuilder
 
             connections.RemoveAt(i);
             connectionLinks.RemoveAt(i);
+        }
+
+        /// <summary>
+        /// Checks the connection count and sets new NodeType 
+        /// </summary>
+        private void CheckForNodeTypeChange()
+        {
+            if (ConnectionCount == 0)
+            {
+                //node
+            }
+            else if (ConnectionCount == 1) { 
+                //End
+            }
+            else if(ConnectionCount == 2)
+            {
+                //curve or vector
+            }
+            else if(ConnectionCount >= 3)
+            {
+                //intersection
+            }
         }
     }
 

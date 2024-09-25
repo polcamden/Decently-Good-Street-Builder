@@ -9,7 +9,7 @@ namespace DecentlyGoodStreetBuilder
     /// </summary>
     public class StreetBuilder : MonoBehaviour
     {
-        [SerializeField, HideInInspector] private List<ElementGroup> groups = new List<ElementGroup>();
+        [SerializeField] private List<ElementGroup> groups = new List<ElementGroup>();
         public ElementGroup this[int index]
 		{
 			get { return groups[index]; }

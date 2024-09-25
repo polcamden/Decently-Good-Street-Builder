@@ -6,6 +6,7 @@ namespace DecentlyGoodStreetBuilder
 	/// <summary>
 	/// Groups together multiple street elements, used to group interchanges or roundabouts. 
 	/// </summary>
+	[System.Serializable]
 	public class ElementGroup : ScriptableObject
 	{
         [SerializeField] private List<StreetElement> streetElements = new List<StreetElement>();

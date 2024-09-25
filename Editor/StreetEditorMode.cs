@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.EditorTools;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEngine.Rendering.GPUSort;
 
 namespace DecentlyGoodStreetBuilder.Editor
 {
@@ -23,9 +20,11 @@ namespace DecentlyGoodStreetBuilder.Editor
         }
 
 		public override void OnToolGUI(EditorWindow _) 
-		{ 
-			//locks the GameObject
-			Selection.objects = new UnityEngine.Object[] { ((StreetBuilder)target).gameObject };
+		{
+            if (streetBuilder == null) DestroyImmediate(this);
+			
+            //locks the GameObject
+            Selection.objects = new UnityEngine.Object[] { ((StreetBuilder)target).gameObject };
 
 			streetBuilder = ((StreetBuilder)target).gameObject.GetComponent<StreetBuilder>();
         }
@@ -54,6 +53,8 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 		public override void OnToolGUI(EditorWindow _)
 		{
+			if (EditorMode.streetBuilder == null) return;
+
 			DrawElements(null);
 
 			DoToSelected();
@@ -66,14 +67,34 @@ namespace DecentlyGoodStreetBuilder.Editor
 				StreetElement elem = EditorMode.streetBuilder.NextElement();
 				while (elem != null)
 				{
-					if (elem.Selected())
+					StreetElement[] selc = elem.Selected();
+
+                    if (selc != null)
 					{
                         if (!Event.current.shift)
                         {
 							selected.Clear();
                         }
 
-                        selected.Add(elem);
+						//prevent double selection and adds shift deselect
+						bool containsAll = true;
+						for (int i = 0; i < selc.Length; i++)
+						{
+							if (!selected.Contains(selc[i]))
+							{
+								selected.Add(selc[i]);
+								containsAll = false;
+                            }
+						}
+
+						if (containsAll)
+						{
+							for (int i = 0; i < selc.Length; i++)
+							{
+								selected.Remove(selc[i]);
+							}
+                        }
+
 						OnSelection();
                         voidClick = false;
 

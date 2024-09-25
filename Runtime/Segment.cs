@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,9 +9,12 @@ namespace DecentlyGoodStreetBuilder
     public class Segment : StreetElement
     {
         [SerializeField] private Node[] connection;
+        [SerializeField] private Vector3[] endPoints;
         [SerializeField] private Vector3 handle;
 
         public override Vector3 Position { get => base.Position; set { } }
+
+        const float SELECTION_DISTANCE = 10;
 
         /// <summary>
         /// Sets Group and links the segment to two nodes
@@ -42,7 +47,9 @@ namespace DecentlyGoodStreetBuilder
             {
                 connection = new Node[2];
                 connection[0] = node1; 
-                connection[1] = node2; 
+                connection[1] = node2;
+
+                endPoints = new Vector3[2];
 
                 node1.AddConnection(node2, this);
                 node2.AddConnection(node1, this);
@@ -63,14 +70,35 @@ namespace DecentlyGoodStreetBuilder
         public override void Draw(string[] args)
         {
             Handles.color = Color.black;
+            if (args.Contains<string>("selected"))
+            {
+                Handles.color = Color.red;
+            }
 
             Handles.DrawLine(connection[0].Position, connection[1].Position, 3);
         }
 
         public override StreetElement[] Selected()
         {
-            return false;
+            float cursorDistance = HandleUtility.DistanceToLine(connection[0].Position, connection[1].Position);
+
+            if (SELECTION_DISTANCE > cursorDistance)
+            {
+                return new StreetElement[] { this, connection[0], connection[1] };
+            }
+
+            return null;
         }
+
+        /// <summary>
+        /// Called by a Node that has been moved. keeps the position of segment between the connections. 
+        /// </summary>
+        public void ConnectionNodePositionUpdate()
+        {
+            base.Position = Vector3.Lerp(connection[0].Position, connection[1].Position, 0.5f);
+        }
+
+
 
         private void OnDestroy()
         {

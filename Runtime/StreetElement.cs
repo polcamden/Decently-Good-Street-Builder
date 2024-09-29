@@ -23,7 +23,14 @@ namespace DecentlyGoodStreetBuilder
 		public virtual Vector3 Position
 		{
 			get { return position; }
-			set { position = value; OnPositionChange(); }
+			set { 
+				if(position != value)
+				{
+                    position = value;
+
+                    OnPositionChange();
+                }
+			}
 		}
 
 		/// <summary>

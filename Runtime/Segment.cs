@@ -8,12 +8,41 @@ namespace DecentlyGoodStreetBuilder
 {
     public class Segment : StreetElement
     {
-        [SerializeField] private Node[] connection;
-        [SerializeField] private Vector3[] endPoints;
-        [SerializeField] private Vector3 handle;
-
         public override Vector3 Position { get => base.Position; set { } }
 
+        [SerializeField] private Node[] connection;
+
+        //curve
+        [SerializeField] private SegmentCurveType curveType;
+        public SegmentCurveType CurveType
+        {
+            get
+            {
+                return curveType;
+            }
+            set
+            {
+                curveType = value;
+                CalculateCurve();
+            }
+        }
+
+        [SerializeField] private Vector3[] endPoints;
+        public Vector3 endPointsWorldPosition(int i)
+        {
+            return Position + endPoints[i];
+        }
+
+        [SerializeField] public Vector3 handleLocalPosition;
+        public Vector3 HandleWorldPosition
+        {
+            get { return Position + handleLocalPosition; }
+            set { handleLocalPosition = value - Position; }
+        }
+
+        [SerializeField] private Vector3[] curve;
+
+        //consts
         const float SELECTION_DISTANCE = 10;
 
         /// <summary>
@@ -75,16 +104,28 @@ namespace DecentlyGoodStreetBuilder
                 Handles.color = Color.red;
             }
 
-            Handles.DrawLine(connection[0].Position, connection[1].Position, 3);
+            if(curve != null && curve.Length >= 2)
+            {
+                for (int i = 0; i < curve.Length-1; i++)
+                {
+                    Handles.DrawLine(curve[i], curve[i + 1], 1);
+                }
+            }
         }
 
         public override StreetElement[] Selected()
         {
-            float cursorDistance = HandleUtility.DistanceToLine(connection[0].Position, connection[1].Position);
-
-            if (SELECTION_DISTANCE > cursorDistance)
+            if (curve != null && curve.Length >= 2)
             {
-                return new StreetElement[] { this, connection[0], connection[1] };
+                for (int i = 0; i < curve.Length - 1; i++)
+                {
+                    float cursorDistance = HandleUtility.DistanceToLine(curve[i], curve[i+1]);
+
+                    if (SELECTION_DISTANCE > cursorDistance)
+                    {
+                        return new StreetElement[] { this, connection[0], connection[1] };
+                    }
+                }
             }
 
             return null;
@@ -96,9 +137,31 @@ namespace DecentlyGoodStreetBuilder
         public void ConnectionNodePositionUpdate()
         {
             base.Position = Vector3.Lerp(connection[0].Position, connection[1].Position, 0.5f);
+
+            CalculateCurve();
         }
 
+        private void CalculateCurve()
+        {
+            switch (curveType)
+            {
+                case SegmentCurveType.Straight:
+                    handleLocalPosition = Vector3.zero;
+                    break;
+                case SegmentCurveType.Curve:
+                    SmoothCurveHandle();
+                    break;
+                case SegmentCurveType.Free:
+                    break;
+            }
 
+            curve = GeometryF.QuadraticBezierCurvePoints(connection[0].Position, connection[1].Position, HandleWorldPosition, 1f, (2f/3f));
+        }
+
+        public void SmoothCurveHandle()
+        {
+
+        }
 
         private void OnDestroy()
         {
@@ -108,5 +171,12 @@ namespace DecentlyGoodStreetBuilder
                 connection[1].RemoveConnection(this);
             }
         }
+    }
+
+    public enum SegmentCurveType
+    {
+        Straight,
+        Curve,
+        Free
     }
 }

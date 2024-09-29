@@ -33,7 +33,6 @@ namespace DecentlyGoodStreetBuilder
         const float HANDLE_SIZE = 0.5f;
         const float SELECTION_DISTANCE = 2f;
 
-
         public void Init(Vector3 position, StreetBuilder streetBuilder, ElementGroup elementGroup = null)
         {
             base.Init(streetBuilder, elementGroup);

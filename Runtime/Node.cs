@@ -52,13 +52,13 @@ namespace DecentlyGoodStreetBuilder
             Handles.SphereHandleCap(0, Position, Quaternion.identity, HANDLE_SIZE, EventType.Repaint);
         }
 
-        public override StreetElement[] Selected()
+        public override ISelectable[] Selected()
         {
             float cursorDistance = HandleUtility.DistanceToCircle(Position, HANDLE_SIZE);
 
             if (SELECTION_DISTANCE > cursorDistance)
             {
-                return new StreetElement[] { this };
+                return new ISelectable[] { this };
             }
 
             return null;
@@ -67,7 +67,7 @@ namespace DecentlyGoodStreetBuilder
         public override void OnPositionChange()
         {
             foreach (var segment in connectionLinks) { 
-                segment.ConnectionNodePositionUpdate();
+                segment.OnPositionChange();
             }
         }
 

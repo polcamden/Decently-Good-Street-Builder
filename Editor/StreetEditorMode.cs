@@ -49,7 +49,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 	
 	public abstract class SelectTool : EditorTool
 	{
-		public List<StreetElement> selected = new List<StreetElement>();
+		public List<ISelectable> selected = new List<ISelectable>();
 
 		public override void OnToolGUI(EditorWindow _)
 		{
@@ -67,7 +67,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 				StreetElement elem = EditorMode.streetBuilder.NextElement();
 				while (elem != null)
 				{
-					StreetElement[] selc = elem.Selected();
+					ISelectable[] selc = elem.Selected();
 
                     if (selc != null)
 					{
@@ -175,9 +175,9 @@ namespace DecentlyGoodStreetBuilder.Editor
 			{
 				Vector3 move = Handles.PositionHandle(center, Quaternion.identity) - center;
 
-				foreach (StreetElement elem in selected)
+				foreach (ISelectable selc in selected)
 				{
-					elem.Position += move;
+					selc.Position += move;
 				}
 
 				OnSelection();
@@ -212,7 +212,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 				//bad cast just testing
 				Segment seg = ScriptableObject.CreateInstance<Segment>();
 
-				seg.Init((Node)selected[0], (Node)selected[1], selected[0].MyStreetBuilder, null);
+				seg.Init((Node)selected[0], (Node)selected[1], ((Node)selected[0]).MyStreetBuilder, null);
 			}
 		}
     }

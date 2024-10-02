@@ -5,7 +5,7 @@ namespace DecentlyGoodStreetBuilder
 	/// <summary>
 	/// Holds shared values between Nodes and Segments. 
 	/// </summary>
-	public abstract class StreetElement : ScriptableObject
+	public abstract class StreetElement : ScriptableObject, ISelectable
 	{
 		[SerializeField] private StreetBuilder myStreetBuilder;
 		public StreetBuilder MyStreetBuilder
@@ -33,12 +33,12 @@ namespace DecentlyGoodStreetBuilder
 			}
 		}
 
-		/// <summary>
-		/// constructorish
-		/// </summary>
-		/// <param name="streetBuilder"></param>
-		/// <param name="elementGroup">null = default group</param>
-		public virtual void Init(StreetBuilder streetBuilder, ElementGroup elementGroup = null)
+        /// <summary>
+        /// constructorish
+        /// </summary>
+        /// <param name="streetBuilder"></param>
+        /// <param name="elementGroup">null = default group</param>
+        public virtual void Init(StreetBuilder streetBuilder, ElementGroup elementGroup = null)
 		{
 			this.myStreetBuilder = streetBuilder;
 
@@ -61,12 +61,12 @@ namespace DecentlyGoodStreetBuilder
 		/// Called to find if the element has been clicked on
 		/// </summary>
 		/// <returns>returns the elements that should be selected</returns>
-		public abstract StreetElement[] Selected();
+		public abstract ISelectable[] Selected();
 
-		/// <summary>
-		/// Called when position is set
-		/// </summary>
-		public virtual void OnPositionChange() { }
+        /// <summary>
+        /// Called when position is set
+        /// </summary>
+        public virtual void OnPositionChange() { }
 
 		/// <summary>
 		/// makes the mesh Gameobject
@@ -76,11 +76,16 @@ namespace DecentlyGoodStreetBuilder
 
 		}
 
-		/// <summary>
-		/// Moves this element to a new group. 
-		/// </summary>
-		/// <param name="newGroup"></param>
-		public void MoveGroups(ElementGroup newGroup)
+        public void Move(Vector3 move)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Moves this element to a new group. 
+        /// </summary>
+        /// <param name="newGroup"></param>
+        public void MoveGroups(ElementGroup newGroup)
 		{
 			myElementGroup.RemoveStreetElement(this);
 			newGroup.AddStreetElement(this);
@@ -91,5 +96,5 @@ namespace DecentlyGoodStreetBuilder
 		{
 			//tell my element group to remove me
 		}
-	}
+    }
 }

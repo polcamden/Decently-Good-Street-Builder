@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace DecentlyGoodStreetBuilder
 {
@@ -23,7 +24,7 @@ namespace DecentlyGoodStreetBuilder
             set
             {
                 curveType = value;
-                CalculateCurve();
+                OnPositionChange();
             }
         }
 
@@ -33,11 +34,18 @@ namespace DecentlyGoodStreetBuilder
             return Position + endPoints[i];
         }
 
-        [SerializeField] public Vector3 handleLocalPosition;
+        [SerializeField] private MoveableHandle handle;
+
         public Vector3 HandleWorldPosition
         {
-            get { return Position + handleLocalPosition; }
-            set { handleLocalPosition = value - Position; }
+            get { return handle.Position; }
+            set { handle.Position = value; }
+        }
+
+        public Vector3 HandleLocalPosition
+        {
+            get { return handle.Position - Position; }
+            set { handle.Position = value + Position; }
         }
 
         [SerializeField] private Vector3[] curve;
@@ -71,18 +79,22 @@ namespace DecentlyGoodStreetBuilder
             if (prevConFound)
             {
                 DestroyImmediate(this);
+                return;
             }
-            else
-            {
-                connection = new Node[2];
-                connection[0] = node1; 
-                connection[1] = node2;
 
-                endPoints = new Vector3[2];
+            connection = new Node[2];
+            connection[0] = node1;
+            connection[1] = node2;
 
-                node1.AddConnection(node2, this);
-                node2.AddConnection(node1, this);
-            }
+            endPoints = new Vector3[2];
+
+            node1.AddConnection(node2, this);
+            node2.AddConnection(node1, this);
+
+            handle = new MoveableHandle();
+            handle.Init(Vector3.zero, new UnityEvent());
+
+            OnPositionChange();
         }
 
         /// <summary>
@@ -98,6 +110,8 @@ namespace DecentlyGoodStreetBuilder
 
         public override void Draw(string[] args)
         {
+            handle.Draw();
+
             Handles.color = Color.black;
             if (args.Contains<string>("selected"))
             {
@@ -113,8 +127,15 @@ namespace DecentlyGoodStreetBuilder
             }
         }
 
-        public override StreetElement[] Selected()
+        public override ISelectable[] Selected()
         {
+            ISelectable[] result = handle.Selected();
+
+            if(result != null)
+            {
+                return result;
+            }
+
             if (curve != null && curve.Length >= 2)
             {
                 for (int i = 0; i < curve.Length - 1; i++)
@@ -131,31 +152,35 @@ namespace DecentlyGoodStreetBuilder
             return null;
         }
 
-        /// <summary>
-        /// Called by a Node that has been moved. keeps the position of segment between the connections. 
-        /// </summary>
-        public void ConnectionNodePositionUpdate()
+        public override void OnPositionChange()
         {
-            base.Position = Vector3.Lerp(connection[0].Position, connection[1].Position, 0.5f);
+            Vector3 newPos = Vector3.Lerp(connection[0].Position, connection[1].Position, 0.5f);
+            Vector3 positionDifference = newPos - Position;
+            base.Position = newPos;
 
-            CalculateCurve();
+            CalculateCurve(positionDifference);
+            UpdateHandle(positionDifference);
         }
 
-        private void CalculateCurve()
+        private void CalculateCurve(Vector3 positionDifference)
+        {
+            curve = GeometryF.QuadraticBezierCurvePoints(connection[0].Position, connection[1].Position, HandleWorldPosition, 1f, (2f/3f));
+        }
+
+        private void UpdateHandle(Vector3 positionDifference)
         {
             switch (curveType)
             {
                 case SegmentCurveType.Straight:
-                    handleLocalPosition = Vector3.zero;
+                    HandleLocalPosition = Vector3.zero;
                     break;
                 case SegmentCurveType.Curve:
                     SmoothCurveHandle();
                     break;
                 case SegmentCurveType.Free:
+                    HandleWorldPosition += positionDifference;
                     break;
             }
-
-            curve = GeometryF.QuadraticBezierCurvePoints(connection[0].Position, connection[1].Position, HandleWorldPosition, 1f, (2f/3f));
         }
 
         public void SmoothCurveHandle()

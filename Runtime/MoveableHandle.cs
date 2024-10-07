@@ -6,7 +6,7 @@ using UnityEngine.Events;
 namespace DecentlyGoodStreetBuilder
 {
     [System.Serializable]
-    public class MoveableHandle : ISelectable
+    public class MoveableHandle : ScriptableObject, ISelectable
     {
         [SerializeField] private Vector3 position;
         public Vector3 Position {
@@ -15,21 +15,21 @@ namespace DecentlyGoodStreetBuilder
             }
             set {
                 position = value;
-                if (callback != null)
+                if (segment != null)
                 {
-                    callback.Invoke();
+                    segment.CalculateCurve();
                 }
             }
         }
         
         const float size = 0.5f;
 
-        [SerializeField] private UnityEvent callback;
+        [SerializeField] private Segment segment;
 
-        public void Init(Vector3 position, UnityEvent callback)
+        public MoveableHandle(Vector3 position, Segment segment)
         {
             this.position = position;
-            this.callback = callback;
+            this.segment = segment;
         }
 
         /// <summary>
@@ -44,9 +44,6 @@ namespace DecentlyGoodStreetBuilder
         public ISelectable[] Selected()
         {
             float cursorDistance = HandleUtility.DistanceToCircle(Position, size);
-
-            Debug.Log(cursorDistance);
-
             if (size > cursorDistance)
             {
                 return new ISelectable[] { this };

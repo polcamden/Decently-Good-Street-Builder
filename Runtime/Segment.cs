@@ -4,6 +4,7 @@ using System.Net;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 namespace DecentlyGoodStreetBuilder
 {
@@ -91,8 +92,7 @@ namespace DecentlyGoodStreetBuilder
             node1.AddConnection(node2, this);
             node2.AddConnection(node1, this);
 
-            handle = new MoveableHandle();
-            handle.Init(Vector3.zero, new UnityEvent());
+            handle = new MoveableHandle(Vector3.zero, this);
 
             OnPositionChange();
         }
@@ -158,11 +158,11 @@ namespace DecentlyGoodStreetBuilder
             Vector3 positionDifference = newPos - Position;
             base.Position = newPos;
 
-            CalculateCurve(positionDifference);
+            CalculateCurve();
             UpdateHandle(positionDifference);
         }
 
-        private void CalculateCurve(Vector3 positionDifference)
+        public void CalculateCurve()
         {
             curve = GeometryF.QuadraticBezierCurvePoints(connection[0].Position, connection[1].Position, HandleWorldPosition, 1f, (2f/3f));
         }

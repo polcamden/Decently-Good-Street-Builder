@@ -14,6 +14,9 @@ namespace DecentlyGoodStreetBuilder
                 return position;
             }
             set {
+                Undo.RecordObject(this, "Handle Move");
+                Undo.undoRedoEvent += OnPositionChange;
+
                 position = value;
                 if (segment != null)
                 {
@@ -24,12 +27,17 @@ namespace DecentlyGoodStreetBuilder
         
         const float size = 0.5f;
 
-        [SerializeField] private Segment segment;
+        [SerializeField] private Segment segment; //why do delgates not get serialized
 
         public MoveableHandle(Vector3 position, Segment segment)
         {
             this.position = position;
             this.segment = segment;
+        }
+
+        public virtual void OnPositionChange(in UndoRedoInfo info)
+        {
+            segment.CalculateCurve();
         }
 
         /// <summary>

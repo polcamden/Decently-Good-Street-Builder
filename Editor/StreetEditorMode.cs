@@ -191,7 +191,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 				foreach (ISelectable selc in selected)
 				{
-					selc.Position += move;
+                    selc.Position += move;
 				}
 
 				OnSelection();

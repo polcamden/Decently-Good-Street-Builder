@@ -8,6 +8,19 @@ namespace DecentlyGoodStreetBuilder
 {
     public class Node : StreetElement
     {
+        public override Vector3 Position { 
+            get => base.Position;
+            set
+            {
+                if (Position != value)
+                {
+                    Undo.RecordObject(this, "Node Transform");
+                    Undo.undoRedoEvent += OnUndo;
+                    base.Position = value;
+                }
+            }
+        }
+
         public int ConnectionCount
         {
             get { return connections.Count; }
@@ -71,6 +84,11 @@ namespace DecentlyGoodStreetBuilder
             }
         }
 
+        private void OnUndo(in UndoRedoInfo info)
+        {
+            OnPositionChange();
+        }
+
         /// <summary>
         /// Should only be called from Segment.Init
         /// </summary>
@@ -80,8 +98,6 @@ namespace DecentlyGoodStreetBuilder
         {
             connections.Add(node);
             connectionLinks.Add(link);
-
-
         }
     
         /// <summary>

@@ -14,7 +14,8 @@ namespace DecentlyGoodStreetBuilder
 
         [SerializeField] private Node[] connection;
 
-        //curve
+        //curve handle
+        [SerializeField] private MoveableHandle handle;
         [SerializeField] private SegmentCurveType curveType;
         public SegmentCurveType CurveType
         {
@@ -34,8 +35,6 @@ namespace DecentlyGoodStreetBuilder
         {
             return Position + endPoints[i];
         }
-
-        [SerializeField] private MoveableHandle handle;
 
         public Vector3 HandleWorldPosition
         {
@@ -110,7 +109,10 @@ namespace DecentlyGoodStreetBuilder
 
         public override void Draw(string[] args)
         {
-            handle.Draw();
+            if (curveType == SegmentCurveType.Free)
+            {
+                handle.Draw();
+            }
 
             Handles.color = Color.black;
             if (args.Contains<string>("selected"))
@@ -144,7 +146,7 @@ namespace DecentlyGoodStreetBuilder
 
                     if (SELECTION_DISTANCE > cursorDistance)
                     {
-                        return new StreetElement[] { this, connection[0], connection[1] };
+                        return new StreetElement[] { this };
                     }
                 }
             }
@@ -188,8 +190,10 @@ namespace DecentlyGoodStreetBuilder
 
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
+
             if (connection[0] != null && connection[1] != null)
             {
                 connection[0].RemoveConnection(this);

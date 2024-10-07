@@ -92,9 +92,9 @@ namespace DecentlyGoodStreetBuilder
 			myElementGroup = newGroup;
 		}
 
-		private void OnDestroy()
+		public virtual void OnDestroy()
 		{
-			//tell my element group to remove me
-		}
+			myElementGroup.RemoveStreetElement(this);
+        }
     }
 }

@@ -160,18 +160,32 @@ namespace DecentlyGoodStreetBuilder.Editor
         public override void OnSelection()
         {
 			Vector3 c = Vector3.zero;
-
+			int a = 0;
 			for (int i = 0; i < selected.Count; i++)
 			{
-				c += selected[i].Position;
+				if (selected[i].GetType() != typeof(Segment))
+				{
+					c += selected[i].Position;
+					a++;
+				}
 			}
 
-			center = c / selected.Count;
+			center = c / a;
         }
 
         public override bool DoToSelected()
         {
-			if (selected.Count > 0)
+			bool selectedOnlySegment = true;
+            for (int i = 0; i < selected.Count; i++)
+            {
+				if (selected[i].GetType() != typeof(Segment))
+				{
+					selectedOnlySegment = false;
+					break;
+                }
+            }
+
+            if (selected.Count > 0 && !selectedOnlySegment)
 			{
 				Vector3 move = Handles.PositionHandle(center, Quaternion.identity) - center;
 
@@ -195,6 +209,11 @@ namespace DecentlyGoodStreetBuilder.Editor
         {
             menu.AppendSeparator();
 
+			if(selected.Count > 0)
+			{
+                menu.AppendAction("Destroy", (item) => DestroySelected());
+            }
+
             if (selected.Count == 2)
 			{
 				menu.AppendAction("Connect", (item) => MeshConnect());
@@ -214,6 +233,18 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 				seg.Init((Node)selected[0], (Node)selected[1], ((Node)selected[0]).MyStreetBuilder, null);
 			}
+		}
+
+		public void DestroySelected()
+		{
+			for (int i = 0; i < selected.Count; i++) {
+				if (selected[i].GetType().IsSubclassOf(typeof(StreetElement)))
+				{
+					DestroyImmediate((StreetElement)selected[i]);
+                }
+			}
+
+			selected.Clear();
 		}
     }
 }

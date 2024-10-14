@@ -15,7 +15,7 @@ namespace DecentlyGoodStreetBuilder
             }
             set {
                 Undo.RecordObject(this, "Handle Move");
-                Undo.undoRedoEvent += OnPositionChange;
+                Undo.undoRedoEvent += OnPositionUndo;
 
                 position = value;
                 if (segment != null)
@@ -33,11 +33,6 @@ namespace DecentlyGoodStreetBuilder
         {
             this.position = position;
             this.segment = segment;
-        }
-
-        public virtual void OnPositionChange(in UndoRedoInfo info)
-        {
-            segment.CalculateCurve();
         }
 
         /// <summary>
@@ -58,6 +53,11 @@ namespace DecentlyGoodStreetBuilder
             }
 
             return null;
+        }
+
+        public void OnPositionUndo(in UndoRedoInfo info)
+        {
+            segment.CalculateCurve();
         }
     }
 }

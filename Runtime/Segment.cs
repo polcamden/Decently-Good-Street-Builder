@@ -1,16 +1,30 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 namespace DecentlyGoodStreetBuilder
 {
     public class Segment : StreetElement
     {
-        public override Vector3 Position { get => base.Position; set { } }
+        public override Vector3 Position { 
+            get => base.Position;
+            set {
+                
+                Vector3 add = value - base.Position;
+                connection[0].Position += add;
+                connection[1].Position += add;
+
+                //Undo.RecordObjects(connection, "Move");
+                /*
+                Vector3 add = base.Position - value;
+
+                connection[0].Position += add;
+                connection[1].Position += add;
+                base.Position = value;*/
+            } 
+        }
 
         [SerializeField] private Node[] connection;
 
@@ -164,11 +178,18 @@ namespace DecentlyGoodStreetBuilder
             UpdateHandle(positionDifference);
         }
 
+        /// <summary>
+        /// Calculates the curve for drawing
+        /// </summary>
         public void CalculateCurve()
         {
             curve = GeometryF.QuadraticBezierCurvePoints(connection[0].Position, connection[1].Position, HandleWorldPosition, 1f, (2f/3f));
         }
 
+        /// <summary>
+        /// Updates handle position based on the curve type and position difference
+        /// </summary>
+        /// <param name="positionDifference"></param>
         private void UpdateHandle(Vector3 positionDifference)
         {
             switch (curveType)

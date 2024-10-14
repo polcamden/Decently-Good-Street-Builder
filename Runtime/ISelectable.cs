@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace DecentlyGoodStreetBuilder
@@ -11,5 +12,7 @@ namespace DecentlyGoodStreetBuilder
         /// </summary>
         /// <returns></returns>
         public ISelectable[] Selected();
+
+        public void OnPositionUndo(in UndoRedoInfo info);
     }
 }

@@ -10,15 +10,7 @@ namespace DecentlyGoodStreetBuilder
     {
         public override Vector3 Position { 
             get => base.Position;
-            set
-            {
-                if (Position != value)
-                {
-                    Undo.RecordObject(this, "Node Transform");
-                    Undo.undoRedoEvent += OnUndo;
-                    base.Position = value;
-                }
-            }
+            set => base.Position = value;
         }
 
         public int ConnectionCount
@@ -82,11 +74,6 @@ namespace DecentlyGoodStreetBuilder
             foreach (var segment in connectionLinks) { 
                 segment.OnPositionChange();
             }
-        }
-
-        private void OnUndo(in UndoRedoInfo info)
-        {
-            OnPositionChange();
         }
 
         /// <summary>

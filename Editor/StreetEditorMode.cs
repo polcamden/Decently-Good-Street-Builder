@@ -163,11 +163,11 @@ namespace DecentlyGoodStreetBuilder.Editor
 			int a = 0;
 			for (int i = 0; i < selected.Count; i++)
 			{
-				if (selected[i].GetType() != typeof(Segment))
-				{
+				/*if (selected[i].GetType() != typeof(Segment))
+				{*/
 					c += selected[i].Position;
 					a++;
-				}
+				//}
 			}
 
 			center = c / a;
@@ -175,7 +175,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 
         public override bool DoToSelected()
         {
-			bool selectedOnlySegment = true;
+			/*bool selectedOnlySegment = true;
             for (int i = 0; i < selected.Count; i++)
             {
 				if (selected[i].GetType() != typeof(Segment))
@@ -183,11 +183,11 @@ namespace DecentlyGoodStreetBuilder.Editor
 					selectedOnlySegment = false;
 					break;
                 }
-            }
+            }*/
 
-            if (selected.Count > 0 && !selectedOnlySegment)
+            if (selected.Count > 0 /*&& !selectedOnlySegment*/)
 			{
-				Vector3 move = Handles.PositionHandle(center, Quaternion.identity) - center;
+                Vector3 move = Handles.PositionHandle(center, Quaternion.identity) - center;
 
 				foreach (ISelectable selc in selected)
 				{

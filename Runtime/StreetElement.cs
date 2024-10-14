@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace DecentlyGoodStreetBuilder
@@ -26,8 +27,9 @@ namespace DecentlyGoodStreetBuilder
 			set { 
 				if(position != value)
 				{
+                    Undo.RecordObject(this, "Move");
+                    Undo.undoRedoEvent += OnPositionUndo;
                     position = value;
-
                     OnPositionChange();
                 }
 			}
@@ -96,5 +98,10 @@ namespace DecentlyGoodStreetBuilder
 		{
 			myElementGroup.RemoveStreetElement(this);
         }
+
+		public virtual void OnPositionUndo(in UndoRedoInfo info)
+		{
+			OnPositionChange();
+		}
     }
 }

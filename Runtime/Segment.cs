@@ -29,8 +29,8 @@ namespace DecentlyGoodStreetBuilder
         [SerializeField] private Node[] connection;
 
         //curve handle
-        [SerializeField] private MoveableHandle handle;
-        [SerializeField] private SegmentCurveType curveType;
+        [SerializeField] private MoveableHandle[] handle;
+        [SerializeField] private SegmentCurveType curveType = SegmentCurveType.Curve;
         public SegmentCurveType CurveType
         {
             get
@@ -50,16 +50,14 @@ namespace DecentlyGoodStreetBuilder
             return Position + endPoints[i];
         }
 
-        public Vector3 HandleWorldPosition
+        public Vector3 GetHandleWorldPosition(int i)
         {
-            get { return handle.Position; }
-            set { handle.Position = value; }
+            return handle[i].Position;
         }
 
-        public Vector3 HandleLocalPosition
+        public void SetHandleWorldPosition(int i, Vector3 value)
         {
-            get { return handle.Position - Position; }
-            set { handle.Position = value + Position; }
+            handle[i].Position = value;
         }
 
         [SerializeField] private Vector3[] curve;
@@ -105,7 +103,7 @@ namespace DecentlyGoodStreetBuilder
             node1.AddConnection(node2, this);
             node2.AddConnection(node1, this);
 
-            handle = new MoveableHandle(Vector3.zero, this);
+            handle = new MoveableHandle[] { new MoveableHandle(Vector3.zero, this), new MoveableHandle(Vector3.zero, this) };
 
             OnPositionChange();
         }
@@ -123,9 +121,10 @@ namespace DecentlyGoodStreetBuilder
 
         public override void Draw(string[] args)
         {
-            if (curveType == SegmentCurveType.Free)
+            if (curveType != SegmentCurveType.Free)
             {
-                handle.Draw();
+                handle[0].Draw();
+                handle[1].Draw();
             }
 
             Handles.color = Color.black;
@@ -145,7 +144,8 @@ namespace DecentlyGoodStreetBuilder
 
         public override ISelectable[] Selected()
         {
-            ISelectable[] result = handle.Selected();
+            ISelectable[] result = handle[0].Selected();
+            result = handle[1].Selected();
 
             if(result != null)
             {
@@ -173,9 +173,9 @@ namespace DecentlyGoodStreetBuilder
             Vector3 newPos = Vector3.Lerp(connection[0].Position, connection[1].Position, 0.5f);
             Vector3 positionDifference = newPos - Position;
             base.Position = newPos;
-
-            CalculateCurve();
+            
             UpdateHandle(positionDifference);
+            CalculateCurve();
         }
 
         /// <summary>
@@ -183,7 +183,12 @@ namespace DecentlyGoodStreetBuilder
         /// </summary>
         public void CalculateCurve()
         {
-            curve = GeometryF.QuadraticBezierCurvePoints(connection[0].Position, connection[1].Position, HandleWorldPosition, 1f, (2f/3f));
+            Vector3 a1 = connection[0].Position;
+            Vector3 a2 = connection[1].Position;
+            Vector3 h1 = GetHandleWorldPosition(0);
+            Vector3 h2 = GetHandleWorldPosition(1);
+
+            curve = GeometryF.CubicBezierCurvePoints(a1, a2, h1, h2, 1f);
         }
 
         /// <summary>
@@ -195,20 +200,69 @@ namespace DecentlyGoodStreetBuilder
             switch (curveType)
             {
                 case SegmentCurveType.Straight:
-                    HandleLocalPosition = Vector3.zero;
+                    StraightCurve();
                     break;
                 case SegmentCurveType.Curve:
                     SmoothCurveHandle();
                     break;
                 case SegmentCurveType.Free:
-                    HandleWorldPosition += positionDifference;
+                    //HandleWorldPosition += positionDifference;
                     break;
             }
         }
 
-        public void SmoothCurveHandle()
+        private void StraightCurve()
         {
+            Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, 1/3f);
+            Vector3 h2 = Vector3.Lerp(connection[0].Position, connection[1].Position, 2/3f);
 
+            SetHandleWorldPosition(0, h1);
+            SetHandleWorldPosition(1, h2);
+        }
+
+        private void SmoothCurveHandle()
+        {
+            float curveDistance = 0;
+            for (int i = 1; i < curve.Length; i++)
+            {
+                curveDistance += Vector3.Distance(curve[i - 1], curve[i]);
+            }
+
+            if (connection[0].ConnectionCount == 2)
+            {
+                Node n = connection[0].GetConnection(0);
+                if(n == connection[1])
+                {
+                    n = connection[0].GetConnection(1);
+                }
+
+                Vector3 handleNormal = (connection[1].Position - n.Position).normalized;
+
+                Debug.Log((n.Position - connection[1].Position).normalized);
+                SetHandleWorldPosition(0, handleNormal * (curveDistance / 3) + connection[0].Position);
+            }
+            else
+            {
+                Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, 1 / 3f);
+                SetHandleWorldPosition(0, h1);
+            }
+
+            if (connection[1].ConnectionCount == 2)
+            {
+                Node n = connection[1].GetConnection(0);
+                if (n == connection[0])
+                {
+                    n = connection[1].GetConnection(1);
+                }
+
+                Vector3 handleNormal = (connection[0].Position - n.Position).normalized;
+                SetHandleWorldPosition(1, handleNormal * (curveDistance / 3) + connection[0].Position);
+            }
+            else
+            {
+                Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, 2 / 3f);
+                SetHandleWorldPosition(1, h1);
+            }
         }
 
         public override void OnDestroy()

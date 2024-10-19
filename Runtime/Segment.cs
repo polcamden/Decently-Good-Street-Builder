@@ -121,7 +121,7 @@ namespace DecentlyGoodStreetBuilder
 
         public override void Draw(string[] args)
         {
-            if (curveType != SegmentCurveType.Free)
+            if (curveType == SegmentCurveType.Free)
             {
                 handle[0].Draw();
                 handle[1].Draw();
@@ -144,12 +144,17 @@ namespace DecentlyGoodStreetBuilder
 
         public override ISelectable[] Selected()
         {
-            ISelectable[] result = handle[0].Selected();
-            result = handle[1].Selected();
-
-            if(result != null)
+            if (curveType == SegmentCurveType.Free)
             {
-                return result;
+                for(int i = 0;i < 2; i++)
+                {
+                    ISelectable[] result = handle[i].Selected();
+
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
             }
 
             if (curve != null && curve.Length >= 2)
@@ -179,6 +184,22 @@ namespace DecentlyGoodStreetBuilder
         }
 
         /// <summary>
+        /// Called when a position change near the segment, enough to effect the curve handles
+        /// </summary>
+        /// <param name="hops"></param>
+        /// <param name="sender"></param>
+        public void NeighborPositionChange(int hops, Segment sender)
+        {
+            UpdateHandle(Vector3.zero);
+            CalculateCurve();
+
+            for (int i = 0; i < 2; i++)
+            {
+                
+            }
+        }
+
+        /// <summary>
         /// Calculates the curve for drawing
         /// </summary>
         public void CalculateCurve()
@@ -197,71 +218,35 @@ namespace DecentlyGoodStreetBuilder
         /// <param name="positionDifference"></param>
         private void UpdateHandle(Vector3 positionDifference)
         {
-            switch (curveType)
-            {
-                case SegmentCurveType.Straight:
-                    StraightCurve();
-                    break;
-                case SegmentCurveType.Curve:
-                    SmoothCurveHandle();
-                    break;
-                case SegmentCurveType.Free:
-                    //HandleWorldPosition += positionDifference;
-                    break;
-            }
-        }
-
-        private void StraightCurve()
-        {
-            Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, 1/3f);
-            Vector3 h2 = Vector3.Lerp(connection[0].Position, connection[1].Position, 2/3f);
-
-            SetHandleWorldPosition(0, h1);
-            SetHandleWorldPosition(1, h2);
-        }
-
-        private void SmoothCurveHandle()
-        {
             float curveDistance = 0;
-            for (int i = 1; i < curve.Length; i++)
+            if (curve != null && curve.Length >= 2)
             {
-                curveDistance += Vector3.Distance(curve[i - 1], curve[i]);
-            }
-
-            if (connection[0].ConnectionCount == 2)
-            {
-                Node n = connection[0].GetConnection(0);
-                if(n == connection[1])
+                for (int i = 1; i < curve.Length; i++)
                 {
-                    n = connection[0].GetConnection(1);
+                    curveDistance += Vector3.Distance(curve[i - 1], curve[i]);
                 }
-
-                Vector3 handleNormal = (connection[1].Position - n.Position).normalized;
-
-                Debug.Log((n.Position - connection[1].Position).normalized);
-                SetHandleWorldPosition(0, handleNormal * (curveDistance / 3) + connection[0].Position);
-            }
-            else
-            {
-                Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, 1 / 3f);
-                SetHandleWorldPosition(0, h1);
             }
 
-            if (connection[1].ConnectionCount == 2)
+            for (int i = 0; i < 2; i++)
             {
-                Node n = connection[1].GetConnection(0);
-                if (n == connection[0])
+                int oppositeNode = i == 0 ? 1 : 0;
+
+                if (curveType == SegmentCurveType.Curve && connection[i].ConnectionCount == 2)
                 {
-                    n = connection[1].GetConnection(1);
-                }
+                    Node n = connection[i].GetConnection(0);
+                    if (n == connection[oppositeNode])
+                    {
+                        n = connection[i].GetConnection(1);
+                    }
 
-                Vector3 handleNormal = (connection[0].Position - n.Position).normalized;
-                SetHandleWorldPosition(1, handleNormal * (curveDistance / 3) + connection[0].Position);
-            }
-            else
-            {
-                Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, 2 / 3f);
-                SetHandleWorldPosition(1, h1);
+                    Vector3 handleNormal = (connection[oppositeNode].Position - n.Position).normalized;
+                    SetHandleWorldPosition(i, handleNormal * (curveDistance / 3) + connection[i].Position);
+                }
+                else if (curveType == SegmentCurveType.Straight || curveType == SegmentCurveType.Curve)
+                {
+                    Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, (i+1) / 3f);
+                    SetHandleWorldPosition(i, h1);
+                }
             }
         }
 
@@ -269,7 +254,7 @@ namespace DecentlyGoodStreetBuilder
         {
             base.OnDestroy();
 
-            if (connection[0] != null && connection[1] != null)
+            if (connection != null && connection[0] != null && connection[1] != null)
             {
                 connection[0].RemoveConnection(this);
                 connection[1].RemoveConnection(this);

@@ -20,7 +20,8 @@ namespace DecentlyGoodStreetBuilder
                 position = value;
                 if (segment != null)
                 {
-                    segment.CalculateCurve();
+                    //Todo delegate
+                    //segment.AdjacentSegmentHasUpdated();
                 }
             }
         }
@@ -29,11 +30,17 @@ namespace DecentlyGoodStreetBuilder
 
         [SerializeField] private Segment segment; //why do delgates not get serialized
 
-        public MoveableHandle(Vector3 position, Segment segment)
+        /*public MoveableHandle(Vector3 position, Segment segment)
         {
             this.position = position;
             this.segment = segment;
-        }
+        }*/
+
+        public void Init(Vector3 position, Segment segment)
+        {
+			this.position = position;
+			this.segment = segment;
+		}
 
         /// <summary>
         /// Draws a selectable handle
@@ -57,7 +64,8 @@ namespace DecentlyGoodStreetBuilder
 
         public void OnPositionUndo(in UndoRedoInfo info)
         {
-            segment.CalculateCurve();
+            //TODO delegate
+            //segment.AdjacentSegmentHasUpdated();
         }
     }
 }

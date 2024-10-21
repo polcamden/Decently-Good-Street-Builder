@@ -103,7 +103,9 @@ namespace DecentlyGoodStreetBuilder
             node1.AddConnection(node2, this);
             node2.AddConnection(node1, this);
 
-            handle = new MoveableHandle[] { new MoveableHandle(Vector3.zero, this), new MoveableHandle(Vector3.zero, this) };
+            handle = new MoveableHandle[] { CreateInstance<MoveableHandle>(), CreateInstance<MoveableHandle>() };
+            handle[0].Init(Vector3.zero, this);
+            handle[1].Init(Vector3.zero, this);
 
             OnPositionChange();
         }
@@ -181,28 +183,42 @@ namespace DecentlyGoodStreetBuilder
             
             UpdateHandle(positionDifference);
             CalculateCurve();
-        }
 
-        /// <summary>
-        /// Called when a position change near the segment, enough to effect the curve handles
-        /// </summary>
-        /// <param name="hops"></param>
-        /// <param name="sender"></param>
-        public void NeighborPositionChange(int hops, Segment sender)
+            //update neighboring segments
+            UpdateAdjacents();
+		}
+
+        private void UpdateAdjacents()
         {
-            UpdateHandle(Vector3.zero);
-            CalculateCurve();
+			for (int i = 0; i < 2; i++)
+			{
+				Node n = connection[i];
 
-            for (int i = 0; i < 2; i++)
-            {
-                
-            }
-        }
+				for (int j = 0; j < n.ConnectionCount; j++)
+				{
+					Segment seg = n.GetConnectionLink(j);
+
+					if (seg != this)
+					{
+						n.GetConnectionLink(j).AdjacentSegmentHasUpdated();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Called by adjacent segment to update the handles
+		/// </summary>
+		public void AdjacentSegmentHasUpdated()
+        {
+			UpdateHandle(Vector3.zero);
+			CalculateCurve();
+		}
 
         /// <summary>
         /// Calculates the curve for drawing
         /// </summary>
-        public void CalculateCurve()
+        private void CalculateCurve()
         {
             Vector3 a1 = connection[0].Position;
             Vector3 a2 = connection[1].Position;
@@ -252,14 +268,16 @@ namespace DecentlyGoodStreetBuilder
 
         public override void OnDestroy()
         {
-            base.OnDestroy();
+			base.OnDestroy();
 
-            if (connection != null && connection[0] != null && connection[1] != null)
+			if (connection != null && connection[0] != null && connection[1] != null)
             {
                 connection[0].RemoveConnection(this);
                 connection[1].RemoveConnection(this);
             }
-        }
+
+			UpdateAdjacents();
+		}
     }
 
     public enum SegmentCurveType

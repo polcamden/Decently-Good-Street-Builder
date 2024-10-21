@@ -43,6 +43,7 @@ namespace DecentlyGoodStreetBuilder
             base.Init(streetBuilder, elementGroup);
 
             Position = position;
+            CheckForNodeTypeChange();
         }
 
         public override void Draw(string[] args)
@@ -85,6 +86,8 @@ namespace DecentlyGoodStreetBuilder
         {
             connections.Add(node);
             connectionLinks.Add(link);
+
+            CheckForNodeTypeChange();
         }
     
         /// <summary>
@@ -97,6 +100,8 @@ namespace DecentlyGoodStreetBuilder
 
             connections.RemoveAt(i);
             connectionLinks.RemoveAt(i);
+
+            CheckForNodeTypeChange();
         }
 
         /// <summary>
@@ -104,31 +109,33 @@ namespace DecentlyGoodStreetBuilder
         /// </summary>
         private void CheckForNodeTypeChange()
         {
-            if (ConnectionCount == 0)
+            if (ConnectionCount == 0 && (nodeType == null || nodeType.GetType() != typeof(Disjointed)))
             {
-                //node
+                nodeType = new Disjointed(this);
             }
-            else if (ConnectionCount == 1) { 
-                //End
-            }
-            else if(ConnectionCount == 2)
+            else if (ConnectionCount == 1 && (nodeType == null || nodeType.GetType() != typeof(EndPoint))) 
             {
-                //curve or vector
+                nodeType = new EndPoint(this);
             }
-            else if(ConnectionCount >= 3)
+            else if(ConnectionCount == 2 && (nodeType == null || nodeType.GetType() != typeof(Continuous)))
             {
-                //intersection
+                nodeType = new Continuous(this);
+            }
+            else if(ConnectionCount >= 3 && (nodeType == null || nodeType.GetType() != typeof(Intersection)))
+            {
+                nodeType = new Intersection(this);
             }
         }
 
         public override void OnDestroy()
         {
-            base.OnDestroy();
-
-            for (int i = 0; i < connectionLinks.Count; i++)
+            for (int i = 0; i < ConnectionCount; i++)
             {
+                Debug.Log(i + " destroy");
                 DestroyImmediate(connectionLinks[i]);
             }
+
+            base.OnDestroy();
         }
     }
 }

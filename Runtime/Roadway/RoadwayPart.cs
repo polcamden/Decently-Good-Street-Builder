@@ -22,8 +22,6 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		bool Collidable { get; }
 
 		Material Material { get; }
-
-
 	}
 
 	public interface IRoadwayObjects

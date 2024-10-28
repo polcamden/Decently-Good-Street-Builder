@@ -35,6 +35,8 @@ namespace DecentlyGoodStreetBuilder
 			}
 		}
 
+		[SerializeField] public GameObject gameObject;
+
         /// <summary>
         /// constructorish
         /// </summary>
@@ -51,7 +53,9 @@ namespace DecentlyGoodStreetBuilder
             this.myElementGroup = elementGroup;
 
             elementGroup.AddStreetElement(this);
-		}
+
+			MakeGameObject();
+        }
 
 		/// <summary>
 		/// Used to draw to the editor scene. 
@@ -68,15 +72,35 @@ namespace DecentlyGoodStreetBuilder
         /// <summary>
         /// Called when position is set
         /// </summary>
-        public virtual void OnPositionChange() { }
+        public virtual void OnPositionChange() {
+			if(gameObject == null)
+			{
+				MakeGameObject();
+			}
+			else
+			{
+				gameObject.transform.position = position;
+			}
+		}
 
 		/// <summary>
 		/// makes the mesh Gameobject
 		/// </summary>
 		public void MakeGameObject()
 		{
+			if (gameObject == null)
+			{
+				gameObject = new GameObject(this.GetType().Name + "-" + this.GetHashCode());
 
-		}
+				gameObject.AddComponent<MeshFilter>();
+				gameObject.AddComponent<MeshRenderer>();
+				gameObject.AddComponent<MeshCollider>();
+			}
+			else
+			{
+				Debug.LogWarning("StreetElement " + this + " trying to create GameObject while having a gameobject already existing. ");
+			}
+        }
 
         public void Move(Vector3 move)
         {

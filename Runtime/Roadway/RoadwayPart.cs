@@ -22,6 +22,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		bool Collidable { get; }
 
 		Material Material { get; }
+
+		public abstract Mesh GenerateMesh(Segment segment, RoadwayData data);
 	}
 
 	public interface IRoadwayObjects

@@ -69,5 +69,26 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		{
 			return data[i];
 		}
+	
+		public void GenerateRoadwayMesh(Segment segment, Mesh mesh)
+		{
+			List<CombineInstance> submeshs = new List<CombineInstance>();
+
+            for (int i = 0; i < Count; i++)
+            {
+                if(GetPart(i).GetType().GetInterface(nameof(IRoadwayMesh)) != null) //does part have IRoadwayMesh
+				{
+					Mesh subMesh = ((IRoadwayMesh)GetPart(i)).GenerateMesh(segment, GetData(i));
+
+					CombineInstance combine = new CombineInstance();
+                    combine.mesh = subMesh;
+					submeshs.Add(combine);
+                }
+            }
+
+            mesh.Clear();
+			mesh.CombineMeshes(submeshs.ToArray(), false, false, false);
+        }
+	
 	}
 }

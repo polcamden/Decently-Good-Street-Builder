@@ -177,6 +177,8 @@ namespace DecentlyGoodStreetBuilder
 
         public override void OnPositionChange()
         {
+            base.OnPositionChange();
+
             Vector3 newPos = Vector3.Lerp(connection[0].Position, connection[1].Position, 0.5f);
             Vector3 positionDifference = newPos - Position;
             base.Position = newPos;

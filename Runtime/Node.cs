@@ -72,6 +72,8 @@ namespace DecentlyGoodStreetBuilder
 
         public override void OnPositionChange()
         {
+            base.OnPositionChange();
+
             foreach (var segment in connectionLinks) { 
                 segment.OnPositionChange();
             }

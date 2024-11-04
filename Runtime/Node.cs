@@ -13,10 +13,6 @@ namespace DecentlyGoodStreetBuilder
             set => base.Position = value;
         }
 
-        public int ConnectionCount
-        {
-            get { return connections.Count; }
-        }
         [SerializeField] private List<Node> connections = new List<Node>();
         public Node GetConnection(int i)
         {
@@ -27,6 +23,11 @@ namespace DecentlyGoodStreetBuilder
         public Segment GetConnectionLink(int i)
         {
             return connectionLinks[i];
+        }
+
+        public int ConnectionCount
+        {
+            get { return connections.Count; }
         }
 
         [SerializeField] private NodeType nodeType;

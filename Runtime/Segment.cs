@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DecentlyGoodStreetBuilder.Roadway;
 using UnityEditor;
 using UnityEngine;
 
@@ -58,6 +59,18 @@ namespace DecentlyGoodStreetBuilder
         public void SetHandleWorldPosition(int i, Vector3 value)
         {
             handle[i].Position = value;
+        }
+
+        [SerializeField] private RoadwayBlueprint roadway;
+
+        public RoadwayBlueprint Roadway
+        {
+            get { return roadway; }
+            set
+            {
+                roadway = value;
+                UpdateGameObject();
+            }
         }
 
         [SerializeField] private Vector3[] curve;
@@ -265,6 +278,23 @@ namespace DecentlyGoodStreetBuilder
                     Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, (i+1) / 3f);
                     SetHandleWorldPosition(i, h1);
                 }
+            }
+
+            UpdateGameObject();
+        }
+
+        private void UpdateGameObject()
+        {
+            if(roadway != null)
+            {
+                Mesh mesh = gameObject.GetComponent<MeshFilter>().sharedMesh;
+
+                if(mesh == null)
+                {
+                    mesh = new Mesh();
+                }
+
+                roadway.GenerateRoadwayMesh(this, mesh);
             }
         }
 

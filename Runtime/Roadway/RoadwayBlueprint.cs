@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using NUnit.Framework;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -70,6 +72,33 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			return data[i];
 		}
 	
+		public void UpdateSegmentsRoadway(Segment segment, Mesh mesh, Dictionary<RoadwayData, List<GameObject>> dataToGameobjects)
+		{
+			bool[] exists = new bool[dataToGameobjects.Count];
+			int existsIndex = 0;
+
+			for (int i = 0; i < Count; i++)
+            {
+				if (GetPart(i).GetType().GetInterface(nameof(IRoadwayObjects)) != null)
+				{
+					RoadwayData data = GetData(i);
+
+					if (dataToGameobjects.ContainsKey(data))
+					{
+						exists[existsIndex] = true;
+						
+					}
+					else
+					{
+						exists[existsIndex] = false;
+					}
+
+                    existsIndex++;
+				}
+			}
+		}
+
+
 		public void GenerateRoadwayMesh(Segment segment, Mesh mesh)
 		{
 			List<CombineInstance> submeshs = new List<CombineInstance>();
@@ -89,6 +118,26 @@ namespace DecentlyGoodStreetBuilder.Roadway
             mesh.Clear();
 			mesh.CombineMeshes(submeshs.ToArray(), false, false, false);
         }
-	
+		
+		public void UpdateGameObjects(Segment segment, Dictionary<RoadwayData, List<GameObject>> gameObjects)
+		{
+			for (int i = 0; i < Count; i++)
+			{
+				RoadwayData data = GetData(i);
+
+
+			}
+
+			//make sure 
+
+            /*for (int i = 0; i < Count; i++)
+            {
+                if (GetPart(i).GetType().GetInterface(nameof(IRoadwayObjects)) != null) //does part have IRoadwayMesh
+                {
+                    //search for existing items in dictionary
+					//if not found 
+                }
+            }*/
+        }
 	}
 }

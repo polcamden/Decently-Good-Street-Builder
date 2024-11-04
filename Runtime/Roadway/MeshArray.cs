@@ -22,6 +22,9 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			get{ return material; }
 		}
 
-
-	}
+        public Mesh GenerateMesh(Segment segment, RoadwayData data)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }

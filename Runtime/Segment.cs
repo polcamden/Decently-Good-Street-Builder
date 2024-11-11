@@ -287,14 +287,15 @@ namespace DecentlyGoodStreetBuilder
         {
             if(roadway != null)
             {
-                Mesh mesh = gameObject.GetComponent<MeshFilter>().sharedMesh;
+                Mesh mesh = GameObject.GetComponent<MeshFilter>().sharedMesh;
 
                 if(mesh == null)
                 {
                     mesh = new Mesh();
+                    GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
                 }
 
-                roadway.GenerateRoadwayMesh(this, mesh);
+                mesh = roadway.GenerateRoadwayMesh(this, mesh);
             }
         }
 

@@ -35,7 +35,12 @@ namespace DecentlyGoodStreetBuilder
 			}
 		}
 
-		[SerializeField] public GameObject gameObject;
+		[SerializeField] private GameObject gameObject;
+
+		public GameObject GameObject
+		{
+			get { return gameObject; }
+		}
 
         /// <summary>
         /// constructorish

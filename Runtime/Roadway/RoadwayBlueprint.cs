@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -99,7 +100,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		}
 
 
-		public void GenerateRoadwayMesh(Segment segment, Mesh mesh)
+		public Mesh GenerateRoadwayMesh(Segment segment, Mesh mesh)
 		{
 			List<CombineInstance> submeshs = new List<CombineInstance>();
 
@@ -111,12 +112,17 @@ namespace DecentlyGoodStreetBuilder.Roadway
 
 					CombineInstance combine = new CombineInstance();
                     combine.mesh = subMesh;
+					//combine.transform = segment.GameObject.transform.localToWorldMatrix;
 					submeshs.Add(combine);
                 }
             }
 
             mesh.Clear();
-			mesh.CombineMeshes(submeshs.ToArray(), false, false, false);
+			mesh = submeshs[0].mesh;
+
+			Debug.Log(mesh);
+
+			return mesh;
         }
 		
 		public void UpdateGameObjects(Segment segment, Dictionary<RoadwayData, List<GameObject>> gameObjects)

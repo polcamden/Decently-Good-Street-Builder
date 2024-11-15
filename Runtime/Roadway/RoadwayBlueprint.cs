@@ -10,8 +10,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 	[CreateAssetMenu(menuName = "DG Street Builder/Roadway")]
 	public class RoadwayBlueprint : ScriptableObject
 	{
-		[SerializeField] private List<RoadwayPart> parts = new List<RoadwayPart>();
-		[SerializeField] private List<RoadwayData> data = new List<RoadwayData>();
+		[SerializeField] private List<RoadwayPart> parts;
+		[SerializeField] private List<RoadwayData> data;
 
 		public int Count
 		{
@@ -73,7 +73,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			return data[i];
 		}
 	
-		public void UpdateSegmentsRoadway(Segment segment, Mesh mesh, Dictionary<RoadwayData, List<GameObject>> dataToGameobjects)
+		/*public void UpdateSegmentsRoadway(Segment segment, Mesh mesh, Dictionary<RoadwayData, List<GameObject>> dataToGameobjects)
 		{
 			bool[] exists = new bool[dataToGameobjects.Count];
 			int existsIndex = 0;
@@ -97,7 +97,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
                     existsIndex++;
 				}
 			}
-		}
+		}*/
 
 
 		public Mesh GenerateRoadwayMesh(Segment segment, Mesh mesh)
@@ -109,20 +109,24 @@ namespace DecentlyGoodStreetBuilder.Roadway
                 if(GetPart(i).GetType().GetInterface(nameof(IRoadwayMesh)) != null) //does part have IRoadwayMesh
 				{
 					Mesh subMesh = ((IRoadwayMesh)GetPart(i)).GenerateMesh(segment, GetData(i));
-
+					
 					CombineInstance combine = new CombineInstance();
                     combine.mesh = subMesh;
-					//combine.transform = segment.GameObject.transform.localToWorldMatrix;
+					combine.transform = segment.GameObject.transform.localToWorldMatrix;
 					submeshs.Add(combine);
                 }
             }
 
             mesh.Clear();
-			mesh = submeshs[0].mesh;
 
-			Debug.Log(mesh);
+			mesh.CombineMeshes(submeshs.ToArray(), true, false, false);
 
-			return mesh;
+			mesh.RecalculateBounds();
+			mesh.RecalculateNormals();
+			mesh.RecalculateTangents();
+			mesh.Optimize();
+
+            return mesh;
         }
 		
 		public void UpdateGameObjects(Segment segment, Dictionary<RoadwayData, List<GameObject>> gameObjects)

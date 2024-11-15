@@ -1,5 +1,6 @@
-using DecentlyGoodStreetBuilder.Roadway;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace DecentlyGoodStreetBuilder.Roadway
 {
@@ -9,10 +10,16 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		[SerializeField] public bool collidable;
 		[SerializeField] public Material material;
 
-		[SerializeField] public Vector2[] verticies;
+		//TODO make private and make GUI for the cross section
+		[SerializeField] public List<Vector3> verticies;
         [SerializeField] public bool[] sharpVerticies;
 		[SerializeField] public float[] uvs;
-        
+
+		public int Count
+		{
+			get { return verticies.Count; }
+		}
+
 		public bool Collidable
 		{
 			get{ return collidable; }
@@ -40,8 +47,6 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			triangles[3] = 3;
 			triangles[4] = 2;
 			triangles[5] = 1;
-
-            Debug.Log("make");
 
             Mesh mesh = new Mesh();
 			mesh.vertices = verticies;

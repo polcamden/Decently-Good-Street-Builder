@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DecentlyGoodStreetBuilder.Roadway;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -74,7 +75,7 @@ namespace DecentlyGoodStreetBuilder
         }
 
         [SerializeField] private Vector3[] curve;
-
+        
         //consts
         const float SELECTION_DISTANCE = 10;
 
@@ -296,6 +297,8 @@ namespace DecentlyGoodStreetBuilder
                 }
 
                 mesh = roadway.GenerateRoadwayMesh(this, mesh);
+
+                GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
             }
         }
 

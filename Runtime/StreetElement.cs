@@ -1,5 +1,8 @@
+using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace DecentlyGoodStreetBuilder
 {
@@ -36,10 +39,67 @@ namespace DecentlyGoodStreetBuilder
 		}
 
 		[SerializeField] private GameObject gameObject;
-
 		public GameObject GameObject
 		{
 			get { return gameObject; }
+		}
+
+		[SerializeField] private List<int> propsHash;
+		[SerializeField] private List<GameObject[]> props;
+
+		/// <summary>
+		/// returns the count of propsHash, does not return the number of total props
+		/// </summary>
+		public int PropGroupCount
+		{
+			get
+			{
+				return propsHash.Count;
+			}
+		}
+
+		public void SetProps(int hashIndex, GameObject[] objects)
+		{
+			int i = propsHash.IndexOf(hashIndex);
+
+			if (i == -1)
+			{
+				Debug.LogError("Trying to set props but has doesnt exist");
+			}
+			else
+			{
+				props[i] = objects;
+			}
+		}
+
+		public void AddPropGroup(int hash)
+		{
+			int i = propsHash.IndexOf(hash);
+
+            if (i == -1)
+			{
+                propsHash.Add(hash);
+				props.Add(new GameObject[0]);
+			}
+			else
+			{
+				Debug.LogError("Trying to add prop Group but has already exist in propHashes");
+			}
+		}
+
+		public void RemovePropGroup(int hash)
+		{
+			int i = propsHash.IndexOf(hash);
+
+			if(i == -1)
+			{
+				Debug.LogError("Trying to remove PropGroup but no propGroup of hash exists");
+			}
+			else
+			{
+				propsHash.RemoveAt(i);
+				props.RemoveAt(i);
+			}
 		}
 
         /// <summary>

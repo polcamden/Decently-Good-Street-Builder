@@ -49,7 +49,7 @@ namespace DecentlyGoodStreetBuilder
         [SerializeField] private Vector3[] endPoints;
         public Vector3 endPointsWorldPosition(int i)
         {
-            return Position + endPoints[i];
+            return connection[i].Position + endPoints[i];
         }
 
         public Vector3 GetHandleWorldPosition(int i)

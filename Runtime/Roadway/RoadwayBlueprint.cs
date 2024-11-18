@@ -10,8 +10,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 	[CreateAssetMenu(menuName = "DG Street Builder/Roadway")]
 	public class RoadwayBlueprint : ScriptableObject
 	{
-		[SerializeField] private List<RoadwayPart> parts;
-		[SerializeField] private List<RoadwayData> data;
+		[SerializeField] private List<RoadwayPart> parts = new List<RoadwayPart>();
+		[SerializeField] private List<RoadwayData> data = new List<RoadwayData>();
 
 		public int Count
 		{

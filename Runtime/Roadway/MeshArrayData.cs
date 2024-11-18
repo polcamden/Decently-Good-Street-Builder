@@ -1,16 +1,12 @@
+using DecentlyGoodStreetBuilder.Roadway;
 using UnityEngine;
 
-public class MeshArrayData : MonoBehaviour
+namespace DecentlyGoodStreetBuilder.Roadway
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    [System.Serializable]
+    public class MeshArrayData : RoadwayData
     {
-        
-    }
+        [SerializeField] public bool mirror;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

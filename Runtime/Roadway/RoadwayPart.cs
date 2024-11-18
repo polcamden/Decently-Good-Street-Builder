@@ -6,7 +6,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 {
     public abstract class RoadwayPart : ScriptableObject
     {
-		public Type DataClass
+		public virtual Type DataClass
 		{
 			get { return typeof(RoadwayData); }
 		}

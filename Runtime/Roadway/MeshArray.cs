@@ -13,7 +13,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		//TODO make private and make GUI for the cross section
 		[SerializeField] public List<Vector2> meshCrossSection;
         [SerializeField] public bool[] sharpVerticies;
-		[SerializeField] public float[] uvs;
+		[SerializeField] public float[] vAxis;
+        [SerializeField] public float horizontalScale;
 
         private const float resolution = 1;
 
@@ -101,7 +102,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
                     vertices[index] = (meshCrossSection[v].x * left * mirrorMultiplier) + (meshCrossSection[v].y * Vector3.up) + points[i];
 
                     //TODO UVS
-                    //uvs[index] = new Vector2(dist * horizontalScale, vAxis[v]);
+                    uvs[index] = new Vector2(dist * horizontalScale, vAxis[v]);
                 }
 
                 if (i != 0)
@@ -114,7 +115,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
                             Debug.Log("asdasd");
                         }
 
-                        if (castedData.mirror) //TODO Roadway data
+                        if (castedData.mirror) 
                         {
                             triangles[triangleCount] = start;
                             triangles[triangleCount + 1] = start - (meshCrossSection.Count);

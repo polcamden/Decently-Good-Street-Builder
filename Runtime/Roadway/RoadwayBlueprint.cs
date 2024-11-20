@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace DecentlyGoodStreetBuilder.Roadway
 {
@@ -100,9 +101,11 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		}*/
 
 
-		public Mesh GenerateRoadwayMesh(Segment segment, Mesh mesh)
+		public (Mesh, Material[]) GenerateRoadwayMesh(Segment segment, Mesh mesh)
 		{
 			List<CombineInstance> submeshs = new List<CombineInstance>();
+
+			List<Material> materials = new List<Material>();
 
             for (int i = 0; i < Count; i++)
             {
@@ -110,23 +113,23 @@ namespace DecentlyGoodStreetBuilder.Roadway
 				{
 					Mesh subMesh = ((IRoadwayMesh)GetPart(i)).GenerateMesh(segment, GetData(i));
 					
-					CombineInstance combine = new CombineInstance();
+                    CombineInstance combine = new CombineInstance();
                     combine.mesh = subMesh;
 					combine.transform = segment.GameObject.transform.localToWorldMatrix;
 					submeshs.Add(combine);
+
+					materials.Add(((IRoadwayMesh)GetPart(i)).Material);
                 }
             }
 
             mesh.Clear();
 
-			mesh.CombineMeshes(submeshs.ToArray(), true, false, false);
+			mesh.CombineMeshes(submeshs.ToArray(), false, false, false);
 
 			mesh.RecalculateBounds();
-			mesh.RecalculateNormals();
-			mesh.RecalculateTangents();
 			mesh.Optimize();
 
-            return mesh;
+            return (mesh, materials.ToArray());
         }
 		
 		public void UpdateGameObjects(Segment segment, Dictionary<RoadwayData, List<GameObject>> gameObjects)

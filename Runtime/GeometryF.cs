@@ -249,6 +249,53 @@ namespace DecentlyGoodStreetBuilder
 			return CubicBezierCurvePoints(a1, a2, h1, h2, resolution);
 		}
 
+		/// <summary>
+		/// Returns the spine normals given the curves points, handle 1 and 2, 
+		/// </summary>
+		/// <param name="points"></param>
+		/// <param name="h1"></param>
+		/// <param name="h2"></param>
+		/// <param name="startDegree">degree at points[0]</param>
+		/// <param name="endDegree">degree at points[points.length]</param>
+		/// <returns></returns>
+		public static Vector3[] BezierCurveToSpine(Vector3[] points, Vector3 h1, Vector3 h2, float startDegree = 0, float endDegree = 0)
+		{
+			Vector3[] spine = new Vector3[points.Length];
+
+			for (int i = 0; i < points.Length; i++)
+			{
+				Vector3 p;
+				float angle = Mathf.Lerp(startDegree, endDegree, (float)i / points.Length);
+
+                if (i == 0) //start
+                {
+                    p = NormalLeft(points[i], h1, startDegree);
+                }
+                else if (i == points.Length - 1) //end
+                {
+                    p = NormalLeft(h2, points[i], endDegree);
+                }
+                else //middle points
+                {
+                    p = NormalLeft(points[i - 1], points[i + 1], angle);
+                }
+
+				spine[i] = p;
+            }
+
+			return spine;
+		}
+
+		/*public static (Vector3, Vector3, Vector3, Vector3) OffsetBezierCurve(Vector3 a1, Vector3 a2, Vector3 h1, Vector3 h2, float offset)
+		{
+			Vector3 newH1;
+			Vector3 newH2;
+			Vector3 newA1;
+			Vector3 newA2;
+
+			return (newA1, newA2, newH1, newH2);
+		}*/
+
         /// <summary>
         /// Takes a value from 0-1 returns a value from 0-1 along Cosine 
         /// </summary>

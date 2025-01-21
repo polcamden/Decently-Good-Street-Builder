@@ -5,15 +5,16 @@ using DecentlyGoodStreetBuilder.Roadway;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DecentlyGoodStreetBuilder
 {
     public class Segment : StreetElement
     {
-        public override Vector3 Position { 
+        public override Vector3 Position {
             get => base.Position;
             set {
-                
+
                 Vector3 add = value - base.Position;
                 connection[0].Position += add;
                 connection[1].Position += add;
@@ -25,13 +26,23 @@ namespace DecentlyGoodStreetBuilder
                 connection[0].Position += add;
                 connection[1].Position += add;
                 base.Position = value;*/
-            } 
+            }
         }
 
         [SerializeField] private Node[] connection;
 
         //curve handle
         [SerializeField] private MoveableHandle[] handle;
+        public Vector3 GetHandleWorldPosition(int i)
+        {
+            return handle[i].Position;
+        }
+        public void SetHandleWorldPosition(int i, Vector3 value)
+        {
+            handle[i].Position = value;
+        }
+
+        //Curve Type
         [SerializeField] private SegmentCurveType curveType = SegmentCurveType.Curve;
         public SegmentCurveType CurveType
         {
@@ -46,24 +57,22 @@ namespace DecentlyGoodStreetBuilder
             }
         }
 
+        //End Point
         [SerializeField] private Vector3[] endPoints;
         public Vector3 endPointsWorldPosition(int i)
         {
             return connection[i].Position + endPoints[i];
         }
 
-        public Vector3 GetHandleWorldPosition(int i)
+        //End Point Angle
+        [SerializeField] private float[] endAngles;
+        public float getAngle(bool firstSecond)
         {
-            return handle[i].Position;
+            return endAngles[firstSecond ? 0 : 1];
         }
 
-        public void SetHandleWorldPosition(int i, Vector3 value)
-        {
-            handle[i].Position = value;
-        }
-
+        //Road Blueprint
         [SerializeField] private RoadwayBlueprint roadway;
-
         public RoadwayBlueprint Roadway
         {
             get { return roadway; }
@@ -113,6 +122,7 @@ namespace DecentlyGoodStreetBuilder
             connection[1] = node2;
 
             endPoints = new Vector3[2];
+            endAngles = new float[2];
 
             node1.AddConnection(node2, this);
             node2.AddConnection(node1, this);
@@ -137,7 +147,7 @@ namespace DecentlyGoodStreetBuilder
 
         public override void Draw(string[] args)
         {
-            if (curveType == SegmentCurveType.Free)
+            if (curveType == SegmentCurveType.Free || args.Contains("debug"))
             {
                 handle[0].Draw();
                 handle[1].Draw();
@@ -154,6 +164,17 @@ namespace DecentlyGoodStreetBuilder
                 for (int i = 0; i < curve.Length-1; i++)
                 {
                     Handles.DrawLine(curve[i], curve[i + 1], 1);
+                }
+            }
+
+            //args.Contains<string>("spine")
+            if (true)
+            {
+                Vector3[] spine = GeometryF.BezierCurveToSpine(curve, handle[0].Position, handle[1].Position, endAngles[0], endAngles[1]);
+
+                for (int i = 0;i < spine.Length - 1; i++)
+                {
+                    Handles.DrawLine(curve[i], curve[i] + spine[i], 1);
                 }
             }
         }
@@ -231,6 +252,16 @@ namespace DecentlyGoodStreetBuilder
 			CalculateCurve();
 		}
 
+        public CubicBezierCurve ToBezierCurve()
+        {
+            Vector3 a1 = connection[0].Position - Position;
+            Vector3 a2 = connection[1].Position - Position;
+            Vector3 h1 = handle[0].Position - Position;
+            Vector3 h2 = handle[1].Position - Position;
+
+            return new CubicBezierCurve(a1, a2, h1, h2, endAngles[0], endAngles[1]);
+        }
+
         /// <summary>
         /// Calculates the curve for drawing
         /// </summary>
@@ -241,7 +272,11 @@ namespace DecentlyGoodStreetBuilder
             Vector3 h1 = GetHandleWorldPosition(0);
             Vector3 h2 = GetHandleWorldPosition(1);
 
-            curve = GeometryF.CubicBezierCurvePoints(a1, a2, h1, h2, 1f);
+            CubicBezierCurve bez = new CubicBezierCurve(a1, a2, h1, h2);
+
+            curve = bez.curvePoints(1);
+            
+            //curve = GeometryF.CubicBezierCurvePoints(a1, a2, h1, h2, 1f);
         }
 
         /// <summary>

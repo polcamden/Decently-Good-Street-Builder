@@ -38,7 +38,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
             get { return typeof(MeshArrayData); }
         }
 
-        public Mesh GenerateMesh(Segment segment, RoadwayData data)
+        public Mesh GenerateMesh(CubicBezierCurve baseCurve, RoadwayData data)
         {
             MeshArrayData castedData = (MeshArrayData)data;
 
@@ -48,20 +48,10 @@ namespace DecentlyGoodStreetBuilder.Roadway
             }
 
             //get curve points
-            Vector3 a1 = segment.endPointsWorldPosition(0);
-            Vector3 a2 = segment.endPointsWorldPosition(1);
-            Vector3 h1 = segment.GetHandleWorldPosition(0);
-            Vector3 h2 = segment.GetHandleWorldPosition(1);
+            CubicBezierCurve offsetCurve = baseCurve.offsetCurve(data.offset);
+            MeshArrayData castData = (MeshArrayData)data;
 
-            Vector3 offset1 = GeometryF.NormalLeft(a1, h1, 0) * data.offset;
-            Vector3 offset2 = GeometryF.NormalLeft(a2, h2, 0) * -data.offset;
-
-            a1 += offset1;
-            a2 += offset2;
-            h1 += offset1;
-            h2 += offset2;
-
-            Vector3[] points = GeometryF.CubicBezierCurvePoints(a1, a2, h1, h2, resolution);
+            (Vector3[] points, Vector3[] spine) = offsetCurve.curvePointsSpine(castData.resolution);
 
             Mesh mesh = new Mesh();
 
@@ -74,21 +64,6 @@ namespace DecentlyGoodStreetBuilder.Roadway
             float dist = 0;
             for (int i = 0; i < points.Length; i++)
             {
-                Vector3 left = new Vector3();
-
-                if (i == 0) //start
-                {
-                    left = GeometryF.NormalLeft(a1, h1, 0);
-                }
-                else if (i == points.Length - 1) //end
-                {
-                    left = GeometryF.NormalLeft(h2, a2, 0);
-                }
-                else //middle points
-                {
-                    left = GeometryF.NormalLeft(points[i - 1], points[i + 1], 0);
-                }
-
 
                 if (i != 0)
                 {
@@ -99,7 +74,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
                 {
                     int index = i * meshCrossSection.Count + v;
 
-                    vertices[index] = (meshCrossSection[v].x * left * mirrorMultiplier) + (meshCrossSection[v].y * Vector3.up) + points[i];
+                    vertices[index] = (meshCrossSection[v].x * spine[i] * mirrorMultiplier) + (meshCrossSection[v].y * Vector3.up) + points[i];
 
                     //TODO UVS
                     uvs[index] = new Vector2(dist * horizontalScale, vAxis[v]);
@@ -143,10 +118,10 @@ namespace DecentlyGoodStreetBuilder.Roadway
                 }
             }
 
-            for (int i = 0; i < vertices.Length; i++)
+            /*for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] -= segment.Position;
-            }
+            }*/
 
             mesh.vertices = vertices;
             mesh.triangles = triangles;

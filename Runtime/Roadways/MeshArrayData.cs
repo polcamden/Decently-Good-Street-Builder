@@ -7,6 +7,6 @@ namespace DecentlyGoodStreetBuilder.Roadway
     public class MeshArrayData : RoadwayData
     {
         [SerializeField] public bool mirror;
-
+        [SerializeField] public float resolution = 1;
     }
 }

@@ -103,6 +103,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 
 		public (Mesh, Material[]) GenerateRoadwayMesh(Segment segment, Mesh mesh)
 		{
+			CubicBezierCurve baseCurve = segment.ToBezierCurve();
+
 			List<CombineInstance> submeshs = new List<CombineInstance>();
 
 			List<Material> materials = new List<Material>();
@@ -111,7 +113,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
             {
                 if(GetPart(i).GetType().GetInterface(nameof(IRoadwayMesh)) != null) //does part have IRoadwayMesh
 				{
-					Mesh subMesh = ((IRoadwayMesh)GetPart(i)).GenerateMesh(segment, GetData(i));
+					Mesh subMesh = ((IRoadwayMesh)GetPart(i)).GenerateMesh(baseCurve, GetData(i));
 					
                     CombineInstance combine = new CombineInstance();
                     combine.mesh = subMesh;

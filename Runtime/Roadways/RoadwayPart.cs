@@ -23,7 +23,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 
 		Material Material { get; }
 
-		public abstract Mesh GenerateMesh(Segment segment, RoadwayData data);
+		public abstract Mesh GenerateMesh(CubicBezierCurve curve, RoadwayData data);
 	}
 
 	public interface IRoadwayObjects

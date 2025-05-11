@@ -3,31 +3,33 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using DecentlyGoodStreetBuilder.Roadway;
+using UnityEditor.PackageManager.UI;
 
 namespace DecentlyGoodStreetBuilder.Editor
 {
     public class AssetLibrary : EditorWindow
     {
-        // "Assets/DGSB Prototype Assets"
-        public static string path = "Assets/protoAssets";
-        
         public static List<Object> assets;
 
-        [MenuItem("Tools/Decently Good Street Builder/Asset Library")]
-        public static void ShowWindow()
-        {
-            //Show existing window instance. If one doesn't exist, make one.
-            EditorWindow.GetWindow(typeof(AssetLibrary));
-        }
+        //will be changed
+        public Segment segment;
 
-        void OnGUI()
+        [MenuItem("Tools/Decently Good Street Builder/Asset Library")]
+        public static void ShowWindow(Segment segment)
+        {
+			AssetLibrary window = GetWindow<AssetLibrary>("Asset Library", true);
+			window.Show();
+            window.segment = segment;
+		}
+
+        private void OnGUI()
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Library");
-            path = GUILayout.TextField(path);
+            //path = GUILayout.TextField(path);
             if (GUILayout.Button("Refresh"))
             {
-                string[] assetFiles = Directory.GetFiles(path);
+                string[] assetFiles = Directory.GetFiles(EditorSettings.Settings.assetPaths[0]);
 
                 assets = new List<Object>();
                 foreach (string assetFile in assetFiles)
@@ -67,11 +69,16 @@ namespace DecentlyGoodStreetBuilder.Editor
 
         public void DrawAsset(Object asset)
         {
+            if(asset == null)
+            {
+                return;
+            }
+
 			GUILayout.BeginVertical();
 			GUILayout.Label($"{asset.name}");
-			if (GUILayout.Button("use"))
+			if (segment != null && asset.GetType() == typeof(RoadwayBlueprint) && GUILayout.Button("apply to segment"))
 			{
-
+                segment.Roadway = (RoadwayBlueprint)asset;
 			}
 			GUILayout.EndVertical();
 		}

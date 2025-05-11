@@ -114,11 +114,6 @@ namespace DecentlyGoodStreetBuilder.Editor
 			}
         }
 
-		private void AddSelected()
-		{
-
-		}
-
 		/// <summary>
 		/// Draws all elements given a string of args
 		/// </summary>
@@ -154,7 +149,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 			if (selected.Count == 1 && selected[0].GetType() == typeof(Segment))
 			{
-                menu.AppendAction("Change Roadway", (item) => ChangeRoadway());
+                menu.AppendAction("Change Roadway", (item) => ChangeRoadway((Segment)selected[0]));
             }
         }
 
@@ -172,9 +167,9 @@ namespace DecentlyGoodStreetBuilder.Editor
 		/// <summary>
 		/// Todo: open a library of roadway materials
 		/// </summary>
-		public void ChangeRoadway()
+		public void ChangeRoadway(Segment segment)
 		{
-			Debug.Log("not implimented");
+			AssetLibrary.ShowWindow(segment);
 		}
 	}
 }

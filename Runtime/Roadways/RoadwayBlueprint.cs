@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 
 namespace DecentlyGoodStreetBuilder.Roadway
 {
-	[CreateAssetMenu(menuName = "DG Street Builder/Roadway")]
+	[CreateAssetMenu(menuName = "Decently Good Street Builder/Roadway", order = 1)]
 	public class RoadwayBlueprint : ScriptableObject
 	{
 		[SerializeField] private List<RoadwayPart> parts = new List<RoadwayPart>();

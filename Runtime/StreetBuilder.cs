@@ -27,7 +27,7 @@ namespace DecentlyGoodStreetBuilder
 
                 if (groups.Count == 0 || groups[0].name != "Default")
                 {
-                    group = new ElementGroup();
+					group = ScriptableObject.CreateInstance<ElementGroup>();
                     group.name = "Default";
                     groups.Insert(0, group);
 				}

@@ -4,7 +4,7 @@ using System;
 
 namespace DecentlyGoodStreetBuilder.Roadway
 {
-    [CreateAssetMenu(menuName = "DG Street Builder/Mesh Array")]
+    [CreateAssetMenu(menuName = "Decently Good Street Builder/Mesh Array", order = 50)]
     public class MeshArray : RoadwayPart, IRoadwayMesh
     {
 		[SerializeField] public bool collidable;

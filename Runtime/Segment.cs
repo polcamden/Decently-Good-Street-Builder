@@ -14,7 +14,7 @@ namespace DecentlyGoodStreetBuilder
         public override Vector3 Position {
             get => base.Position;
             set {
-
+                Debug.LogWarning($"Position set on Segments should not be commonly used {this}");
                 Vector3 add = value - base.Position;
                 connection[0].Position += add;
                 connection[1].Position += add;
@@ -30,6 +30,10 @@ namespace DecentlyGoodStreetBuilder
         }
 
         [SerializeField] private Node[] connection;
+        public Node GetConnection(int i)
+        {
+            return connection[i];
+        }
 
         //curve handle
         [SerializeField] private MoveableHandle[] handle;

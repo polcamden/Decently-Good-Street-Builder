@@ -7,11 +7,6 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     /// </summary>
     public class Disjointed : NodeType
     {
-        public Disjointed(Node myNode) : base(myNode)
-        {
-
-        }
-
         public override void Draw()
         {
             throw new System.NotImplementedException();

@@ -12,7 +12,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 	public class EditorMode : EditorToolContext
 	{
 		public static StreetBuilder streetBuilder;
-
+		
 		public static void AddNode()
 		{
             Node node = CreateInstance<Node>();
@@ -51,7 +51,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 	
 	public class SelectTool : EditorTool
 	{
-		public List<ISelectable> selected = new List<ISelectable>();
+		public static List<ISelectable> selected = new List<ISelectable>();
 
 		public override void OnToolGUI(EditorWindow _)
 		{
@@ -149,7 +149,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 
 			if (selected.Count == 1 && selected[0].GetType() == typeof(Segment))
 			{
-                menu.AppendAction("Change Roadway", (item) => ChangeRoadway((Segment)selected[0]));
+                menu.AppendAction("Change Roadway", (item) => ChangeRoadway());
             }
         }
 
@@ -167,9 +167,9 @@ namespace DecentlyGoodStreetBuilder.Editor
 		/// <summary>
 		/// Todo: open a library of roadway materials
 		/// </summary>
-		public void ChangeRoadway(Segment segment)
+		public void ChangeRoadway()
 		{
-			AssetLibrary.ShowWindow(segment);
+			AssetLibrary.ShowWindow();
 		}
 	}
 }

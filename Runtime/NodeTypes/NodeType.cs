@@ -4,14 +4,19 @@ using UnityEngine;
 namespace DecentlyGoodStreetBuilder.NodeTypes
 {
     [System.Serializable]
-    public abstract class NodeType
+    public abstract class NodeType : ScriptableObject
     {
-        private Node myNode;
+        [SerializeField] private Node myNode;
 
-        public NodeType(Node myNode)
+        public Node MyNode
         {
-            this.myNode = myNode;
+            get {  return myNode; }
         }
+
+        public virtual void Init(Node myNode)
+        {
+			this.myNode = myNode;
+		}
 
         public abstract void Draw();
 

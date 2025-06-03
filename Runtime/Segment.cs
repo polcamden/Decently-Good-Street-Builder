@@ -68,6 +68,12 @@ namespace DecentlyGoodStreetBuilder
             return connection[i].Position + endPoints[i];
         }
 
+        public void SetEndPointRelativeToNode(Node node, Vector3 position)
+        {
+            int i = node == connection[0] ? 0 : 1;
+            endPoints[i] = position;
+        }
+
         //End Point Angle
         [SerializeField] private float[] endAngles;
         public float getAngle(bool firstSecond)

@@ -7,10 +7,6 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     /// </summary>
     public class Continuous : NodeType
     {
-        public Continuous(Node myNode) : base(myNode)
-        {
-        }
-
         public override void Draw()
         {
             throw new System.NotImplementedException();

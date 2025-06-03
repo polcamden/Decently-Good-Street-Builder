@@ -78,6 +78,11 @@ namespace DecentlyGoodStreetBuilder
             foreach (var segment in connectionLinks) { 
                 segment.OnPositionChange();
             }
+
+            if (nodeType != null)
+            {
+                nodeType.HandleUpdate();
+			}
         }
 
         /// <summary>
@@ -114,20 +119,23 @@ namespace DecentlyGoodStreetBuilder
         {
             if (ConnectionCount == 0 && (nodeType == null || nodeType.GetType() != typeof(Disjointed)))
             {
-                nodeType = new Disjointed(this);
+                nodeType = CreateInstance<Disjointed>();
             }
             else if (ConnectionCount == 1 && (nodeType == null || nodeType.GetType() != typeof(EndPoint))) 
             {
-                nodeType = new EndPoint(this);
+                nodeType = CreateInstance<EndPoint>();
             }
             else if(ConnectionCount == 2 && (nodeType == null || nodeType.GetType() != typeof(Continuous)))
             {
-                nodeType = new Continuous(this);
+                nodeType = CreateInstance<Continuous>();
             }
             else if(ConnectionCount >= 3 && (nodeType == null || nodeType.GetType() != typeof(Intersection)))
             {
-                nodeType = new Intersection(this);
+                nodeType = CreateInstance<Intersection>();
             }
+
+            if(nodeType != null)
+                nodeType.Init(this);
         }
 
         public override void OnDestroy()

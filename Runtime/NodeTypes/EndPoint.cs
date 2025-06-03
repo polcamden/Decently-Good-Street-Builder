@@ -7,10 +7,6 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     /// </summary>
     public class EndPoint : NodeType
     {
-        public EndPoint(Node myNode) : base(myNode)
-        {
-        }
-
         public override void Draw()
         {
             throw new System.NotImplementedException();

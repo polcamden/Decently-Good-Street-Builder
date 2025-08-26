@@ -3,18 +3,18 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using DecentlyGoodStreetBuilder.Roadway;
-using UnityEditor.PackageManager.UI;
-using static Codice.Client.BaseCommands.Import.Commit;
+using System;
+using Object = UnityEngine.Object;
 
 namespace DecentlyGoodStreetBuilder.Editor
 {
     public class AssetLibrary : EditorWindow
     {
-        private List<Object> assets;
+        private List<Object> roadwayBlueprints;
+		//private List<RoadwayParts> roadwayParts;
 
-        private List<string> assetPaths;
-
-        private bool showSettings = false;
+		private bool showSettings = false;
+		private List<string> assetPaths;
 
         [MenuItem("Tools/Decently Good Street Builder/Asset Library")]
         public static void ShowWindow()
@@ -56,7 +56,7 @@ namespace DecentlyGoodStreetBuilder.Editor
 			}
             if (GUILayout.Button("Refresh", GUILayout.Width(84)))
             {
-                LoadAssets();
+                LoadAllAssets();
 			}
             GUILayout.EndHorizontal();
             DrawDivider();
@@ -68,19 +68,47 @@ namespace DecentlyGoodStreetBuilder.Editor
 			}
 
             //Asset List
-            if(assets != null)
-                DrawAssetList(assets, 3);
+            if(roadwayBlueprints != null)
+                DrawAssetList(roadwayBlueprints, 3);
         }
 
-        private void LoadAssets()
+        private void LoadAllAssets()
         {
-			assets = new List<Object>();
-			foreach (string assetFile in assetPaths)
+            roadwayBlueprints = new List<Object>();
+
+            foreach(string assetDir in assetPaths)
+            {
+                try
+                {
+                    if (Directory.Exists(assetDir))
+                    {
+                        LoadAssetsAtPath(assetDir);
+					}
+                    else
+                    {
+                        Debug.LogError($"Invalid asset path {assetDir}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e.Message);
+                }
+			}
+
+		}
+
+        private void LoadAssetsAtPath(string dirPath)
+        {
+			string[] assetPathsInDir = Directory.GetFiles(dirPath);
+
+			foreach (string assetPath in assetPathsInDir)
 			{
-				Object asset = AssetDatabase.LoadAssetAtPath(assetFile, typeof(Object));
+                Object asset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
 
 				if (asset != null && asset.GetType() == typeof(RoadwayBlueprint))
-					assets.Add(asset);
+				{
+					roadwayBlueprints.Add(asset);
+				}
 			}
 		}
 

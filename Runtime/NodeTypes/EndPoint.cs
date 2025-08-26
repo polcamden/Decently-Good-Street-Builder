@@ -9,17 +9,17 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     {
         public override void Draw()
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
         }
 
         public override void GenerateMesh()
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
         }
 
         public override void HandleUpdate()
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
         }
     }
 }

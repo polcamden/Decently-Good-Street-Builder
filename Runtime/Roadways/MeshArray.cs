@@ -64,7 +64,6 @@ namespace DecentlyGoodStreetBuilder.Roadway
             float dist = 0;
             for (int i = 0; i < points.Length; i++)
             {
-
                 if (i != 0)
                 {
                     dist += Vector3.Distance(points[i - 1], points[i]);

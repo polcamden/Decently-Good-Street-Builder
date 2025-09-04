@@ -262,31 +262,38 @@ namespace DecentlyGoodStreetBuilder
 			CalculateCurve();
 		}
 
+        /// <summary>
+        /// Makes a CubicBezierCurve relative to the position.
+        /// </summary>
+        /// <returns></returns>
         public CubicBezierCurve ToBezierCurve()
         {
-            Vector3 a1 = connection[0].Position - Position;
+			/*Vector3 a1 = connection[0].Position - Position;
             Vector3 a2 = connection[1].Position - Position;
             Vector3 h1 = handle[0].Position - Position;
-            Vector3 h2 = handle[1].Position - Position;
+            Vector3 h2 = handle[1].Position - Position;*/
 
-            return new CubicBezierCurve(a1, a2, h1, h2, endAngles[0], endAngles[1]);
+			Vector3 a1 = endPointsWorldPosition(0) - Position;
+			Vector3 a2 = endPointsWorldPosition(1) - Position;
+			Vector3 h1 = GetHandleWorldPosition(0) - Position;
+			Vector3 h2 = GetHandleWorldPosition(1) - Position;
+
+			return new CubicBezierCurve(a1, a2, h1, h2, endAngles[0], endAngles[1]);
         }
 
         /// <summary>
-        /// Calculates the curve for drawing
+        /// Calculates the curve for drawing Todo: rely on ToBezierCurve
         /// </summary>
         private void CalculateCurve()
         {
-            Vector3 a1 = connection[0].Position;
-            Vector3 a2 = connection[1].Position;
+            Vector3 a1 = endPointsWorldPosition(0);
+            Vector3 a2 = endPointsWorldPosition(1);
             Vector3 h1 = GetHandleWorldPosition(0);
             Vector3 h2 = GetHandleWorldPosition(1);
 
             CubicBezierCurve bez = new CubicBezierCurve(a1, a2, h1, h2);
 
             curve = bez.curvePoints(1);
-            
-            //curve = GeometryF.CubicBezierCurvePoints(a1, a2, h1, h2, 1f);
         }
 
         /// <summary>
@@ -321,7 +328,7 @@ namespace DecentlyGoodStreetBuilder
                 }
                 else if (curveType == SegmentCurveType.Straight || curveType == SegmentCurveType.Curve)
                 {
-                    Vector3 h1 = Vector3.Lerp(connection[0].Position, connection[1].Position, (i+1) / 3f);
+                    Vector3 h1 = Vector3.Lerp(endPointsWorldPosition(0), endPointsWorldPosition(1), (i+1) / 3f);
                     SetHandleWorldPosition(i, h1);
                 }
             }

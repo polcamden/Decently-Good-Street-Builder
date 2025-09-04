@@ -76,7 +76,11 @@ namespace DecentlyGoodStreetBuilder.Editor
                 menu.AppendAction("Destroy", (item) => DestroySelected());
             }
 
-            if (selected.Count == 2)
+            if(selected.Count == 1)
+            {
+				menu.AppendAction("Inspect Selected", (item) => InspectSelected());
+			}
+            else if (selected.Count == 2)
             {
                 menu.AppendAction("Connect", (item) => MeshConnect());
             }
@@ -109,5 +113,5 @@ namespace DecentlyGoodStreetBuilder.Editor
 
             selected.Clear();
         }
-    }
+	}
 }

@@ -8,16 +8,16 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 	[System.Serializable]
 	public class Intersection : NodeType
     {
-        int radius = 10;
+        int radius = 6;
 
         public override void Draw()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void GenerateMesh()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void HandleUpdate()
@@ -27,12 +27,12 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 Node n = MyNode.GetConnectionLink(i).GetConnection(0);
                 if(n == MyNode)
                 {
-					MyNode.GetConnectionLink(i).GetConnection(1);
+					n = MyNode.GetConnectionLink(i).GetConnection(1);
 				}
 
                 Vector3 endPoint = GeometryF.Normal(MyNode.Position, n.Position) * radius;
-                Debug.Log(endPoint);
-                MyNode.GetConnectionLink(i).SetEndPointRelativeToNode(MyNode, new Vector3(10, 2, 6));
+
+                MyNode.GetConnectionLink(i).SetEndPointRelativeToNode(MyNode, endPoint);
 			}
 		}
     }

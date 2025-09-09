@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace DecentlyGoodStreetBuilder.NodeTypes
@@ -9,17 +10,23 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     {
         public override void Draw()
         {
-            //throw new System.NotImplementedException();
+            
         }
 
         public override void GenerateMesh()
         {
-            //throw new System.NotImplementedException();
+            
         }
 
         public override void HandleUpdate()
         {
-            //throw new System.NotImplementedException();
-        }
+			if (MyNode.ConnectionCount != 1)
+			{
+				Debug.LogError("EndPoint is being used on a node that doesn't have 1 connections");
+                return;
+			}
+
+
+		}
     }
 }

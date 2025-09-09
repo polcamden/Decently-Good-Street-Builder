@@ -8,7 +8,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 	[System.Serializable]
 	public class Intersection : NodeType
     {
-        int radius = 6;
+        [SerializeField] float radius = 6;
 
         public override void Draw()
         {
@@ -22,6 +22,12 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public override void HandleUpdate()
         {
+            if (MyNode.ConnectionCount < 3)
+            {
+                Debug.LogError("Intersection is being used on a node that doesn't have 3 or more connections");
+                return;
+            }
+
 			for (int i = 0; i < MyNode.ConnectionCount; i++)
 			{
                 Node n = MyNode.GetConnectionLink(i).GetConnection(0);

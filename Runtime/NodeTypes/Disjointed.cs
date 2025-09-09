@@ -19,7 +19,11 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public override void HandleUpdate()
         {
-            
-        }
+			if (MyNode.ConnectionCount == 2)
+			{
+				Debug.LogError("Continuous is being used on a node that doesn't have 2 connections");
+				return;
+			}
+		}
     }
 }

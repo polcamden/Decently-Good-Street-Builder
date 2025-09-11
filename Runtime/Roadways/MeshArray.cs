@@ -14,9 +14,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		[SerializeField] public List<Vector2> meshCrossSection;
         [SerializeField] public bool[] sharpVerticies;
 		[SerializeField] public float[] vAxis;
-        [SerializeField] public float horizontalScale;
-
-        private const float resolution = 1;
+        [SerializeField] public float uScale;
 
 		public int Count
 		{
@@ -38,7 +36,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
             get { return typeof(MeshArrayData); }
         }
 
-        public Mesh GenerateMesh(CubicBezierCurve baseCurve, RoadwayData data)
+        public virtual Mesh GenerateMesh(CubicBezierCurve baseCurve, RoadwayData data)
         {
             MeshArrayData castedData = (MeshArrayData)data;
 
@@ -55,7 +53,6 @@ namespace DecentlyGoodStreetBuilder.Roadway
 
             Mesh mesh = new Mesh();
 
-            //TODO roadway data
             int mirrorMultiplier = castedData.mirror ? -1 : 1;
             Vector3[] vertices = new Vector3[points.Length * meshCrossSection.Count];
             Vector2[] uvs = new Vector2[vertices.Length];
@@ -76,9 +73,9 @@ namespace DecentlyGoodStreetBuilder.Roadway
                     vertices[index] = (meshCrossSection[v].x * spine[i] * mirrorMultiplier) + (meshCrossSection[v].y * Vector3.up) + points[i];
 
                     //TODO UVS
-                    uvs[index] = new Vector2(dist * horizontalScale, vAxis[v]);
+                    uvs[index] = new Vector2(dist * uScale, vAxis[v]);
                 }
-
+                
                 if (i != 0)
                 {
                     for (int y = 0; y < meshCrossSection.Count - 1; y++)
@@ -126,6 +123,21 @@ namespace DecentlyGoodStreetBuilder.Roadway
             mesh.triangles = triangles;
             mesh.uv = uvs;
             mesh.RecalculateNormals();
+            return mesh;
+        }
+
+        /// <summary>
+        /// Generates a mesh by placing a meshCrossSection along a bezier curve. 
+        /// </summary>
+        /// <param name="meshCrossSection">Array of vertices</param>
+        /// <param name="sharpVerticies">Which vertices are sharp edges</param>
+        /// <param name="vAxis">The v-axis of the uv for vertices</param>
+        /// <param name="uScale">The u-axis of the uv along the bezier curve</param>
+        /// <returns>returns a mesh</returns>
+        public Mesh GenerateMeshGivenSlice(CubicBezierCurve baseCurve, Vector2[] meshCrossSection, bool[] sharpVerticies, float[] vAxis, float uScale)
+        {
+            Mesh mesh = new Mesh();
+
             return mesh;
         }
     }

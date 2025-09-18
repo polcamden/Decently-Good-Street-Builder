@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+using NUnit.Framework.Interfaces;
 
 namespace DecentlyGoodStreetBuilder.Roadway
 {
@@ -47,83 +49,19 @@ namespace DecentlyGoodStreetBuilder.Roadway
 
             //get curve points
             CubicBezierCurve offsetCurve = baseCurve.offsetCurve(data.offset);
-            MeshArrayData castData = (MeshArrayData)data;
 
-            (Vector3[] points, Vector3[] spine) = offsetCurve.curvePointsSpine(castData.resolution);
+			//TODO make vaxis and sharpVerts flip when mirrored 
+			Vector2[] cross = meshCrossSection.ToArray();
 
-            Mesh mesh = new Mesh();
-
-            int mirrorMultiplier = castedData.mirror ? -1 : 1;
-            Vector3[] vertices = new Vector3[points.Length * meshCrossSection.Count];
-            Vector2[] uvs = new Vector2[vertices.Length];
-            int[] triangles = new int[(points.Length - 1) * (meshCrossSection.Count - 1) * 6];
-            int triangleCount = 0;
-            float dist = 0;
-            for (int i = 0; i < points.Length; i++)
+            if (castedData.mirror)
             {
-                if (i != 0)
+                for (int i = 0; i < cross.Length; i++)
                 {
-                    dist += Vector3.Distance(points[i - 1], points[i]);
-                }
-
-                for (int v = 0; v < meshCrossSection.Count; v++)
-                {
-                    int index = i * meshCrossSection.Count + v;
-
-                    vertices[index] = (meshCrossSection[v].x * spine[i] * mirrorMultiplier) + (meshCrossSection[v].y * Vector3.up) + points[i];
-
-                    //TODO UVS
-                    uvs[index] = new Vector2(dist * uScale, vAxis[v]);
-                }
-                
-                if (i != 0)
-                {
-                    for (int y = 0; y < meshCrossSection.Count - 1; y++)
-                    {
-                        int start = i * meshCrossSection.Count + y;
-                        if (start - (meshCrossSection.Count) < 0)
-                        {
-                            Debug.Log("asdasd");
-                        }
-
-                        if (castedData.mirror) 
-                        {
-                            triangles[triangleCount] = start;
-                            triangles[triangleCount + 1] = start - (meshCrossSection.Count);
-                            triangles[triangleCount + 2] = start - (meshCrossSection.Count) + 1;
-
-                            triangles[triangleCount + 4] = start;
-                            triangles[triangleCount + 3] = start + 1;
-                            triangles[triangleCount + 5] = start - (meshCrossSection.Count) + 1;
-                        }
-                        else
-                        {
-                            triangles[triangleCount] = start;
-                            triangles[triangleCount + 2] = start - (meshCrossSection.Count);
-                            triangles[triangleCount + 1] = triangles[triangleCount + 2] + 1;
-
-                            triangles[triangleCount + 3] = start;
-                            triangles[triangleCount + 4] = start + 1;
-                            triangles[triangleCount + 5] = triangles[triangleCount + 1];
-                        }
-
-                        triangleCount += 6;
-                    }
-
-
+                    cross[meshCrossSection.Count - 1 - i] = new Vector2(-meshCrossSection[i].x, meshCrossSection[i].y);
                 }
             }
 
-            /*for (int i = 0; i < vertices.Length; i++)
-            {
-                vertices[i] -= segment.Position;
-            }*/
-
-            mesh.vertices = vertices;
-            mesh.triangles = triangles;
-            mesh.uv = uvs;
-            mesh.RecalculateNormals();
-            return mesh;
+            return GenerateMeshGivenSlice(offsetCurve, castedData.resolution, cross, sharpVerticies, vAxis, uScale);
         }
 
         /// <summary>
@@ -134,11 +72,63 @@ namespace DecentlyGoodStreetBuilder.Roadway
         /// <param name="vAxis">The v-axis of the uv for vertices</param>
         /// <param name="uScale">The u-axis of the uv along the bezier curve</param>
         /// <returns>returns a mesh</returns>
-        public Mesh GenerateMeshGivenSlice(CubicBezierCurve baseCurve, Vector2[] meshCrossSection, bool[] sharpVerticies, float[] vAxis, float uScale)
+        public Mesh GenerateMeshGivenSlice(CubicBezierCurve curve, float resolution, Vector2[] meshCrossSection, bool[] sharpVerticies, float[] vAxis, float uScale)
         {
-            Mesh mesh = new Mesh();
 
-            return mesh;
+			(Vector3[] points, Vector3[] spine) = curve.curvePointsSpine(resolution);
+
+			Vector3[] vertices = new Vector3[points.Length * meshCrossSection.Length];
+			Vector2[] uvs = new Vector2[vertices.Length];
+			int[] triangles = new int[(points.Length - 1) * (meshCrossSection.Length - 1) * 6];
+			int triangleCount = 0;
+			float dist = 0;
+
+			for (int i = 0; i < points.Length; i++)
+			{
+				if (i != 0)
+				{
+					dist += Vector3.Distance(points[i - 1], points[i]);
+				}
+
+				for (int v = 0; v < meshCrossSection.Length; v++)
+				{
+					int index = i * meshCrossSection.Length + v;
+
+					vertices[index] = (meshCrossSection[v].x * spine[i]) + (meshCrossSection[v].y * Vector3.up) + points[i];
+
+					//TODO UVS
+					uvs[index] = new Vector2(dist * uScale, vAxis[v]);
+				}
+
+				if (i != 0)
+				{
+					for (int y = 0; y < meshCrossSection.Length - 1; y++)
+					{
+						int start = i * meshCrossSection.Length + y;
+
+						triangles[triangleCount] = start;
+						triangles[triangleCount + 2] = start - (meshCrossSection.Length);
+						triangles[triangleCount + 1] = triangles[triangleCount + 2] + 1;
+
+						triangles[triangleCount + 3] = start;
+						triangles[triangleCount + 4] = start + 1;
+						triangles[triangleCount + 5] = triangles[triangleCount + 1];
+
+						triangleCount += 6;
+					}
+
+
+				}
+			}
+
+			Mesh mesh = new Mesh();
+			mesh.vertices = vertices;
+			mesh.triangles = triangles;
+			mesh.uv = uvs;
+			mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            mesh.RecalculateBounds();
+			return mesh;
         }
     }
 }

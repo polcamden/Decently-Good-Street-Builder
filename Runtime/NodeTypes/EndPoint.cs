@@ -26,7 +26,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 return;
 			}
 
-
+			Segment s1 = MyNode.GetConnectionLink(0);
+			s1.SetEndPointRelativeToNode(MyNode, Vector3.zero);
 		}
     }
 }

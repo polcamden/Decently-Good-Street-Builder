@@ -72,7 +72,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
         /// <param name="vAxis">The v-axis of the uv for vertices</param>
         /// <param name="uScale">The u-axis of the uv along the bezier curve</param>
         /// <returns>returns a mesh</returns>
-        public Mesh GenerateMeshGivenSlice(CubicBezierCurve curve, float resolution, Vector2[] meshCrossSection, bool[] sharpVerticies, float[] vAxis, float uScale)
+        public static Mesh GenerateMeshGivenSlice(CubicBezierCurve curve, float resolution, Vector2[] meshCrossSection, bool[] sharpVerticies, float[] vAxis, float uScale)
         {
 
 			(Vector3[] points, Vector3[] spine) = curve.curvePointsSpine(resolution);

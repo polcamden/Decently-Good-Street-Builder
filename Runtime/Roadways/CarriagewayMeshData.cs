@@ -4,9 +4,11 @@ namespace DecentlyGoodStreetBuilder.Roadway
 {
     public class CarriagewayMeshData : RoadwayData
     {
-        [SerializeField] public float height = 1;
         [SerializeField] public float width = 6;
-        [SerializeField] public float margin = 3;
-        [SerializeField] public float marginDegree = 45;
+        [SerializeField] public bool enableMargins = true;
+		[Range(0.01f, 10f)]
+		[SerializeField] public float marginSize = 3;
+		[Range(0, 90)]
+		[SerializeField] public float marginDegree = 45;
     }
 }

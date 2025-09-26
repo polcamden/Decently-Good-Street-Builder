@@ -175,6 +175,6 @@ public struct CubicBezierCurve
         Vector3 h1 = handle1 + left1 * offset;
         Vector3 h2 = handle2 + left2 * offset;
 
-        return new CubicBezierCurve(a1, a2, h1, h2);
+        return new CubicBezierCurve(a1, a2, h1, h2, angle1, angle2);
     }
 }

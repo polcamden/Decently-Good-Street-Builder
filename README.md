@@ -20,11 +20,12 @@
 
 <details>
   <summary>Table of Contents</summary>
+  <a href="#about-this-project">- About this Project -</a><br>
     <a href="#getting-started">- Getting Started -</a><br>
       <a href="#installation">Installation</a><br>
-      <a href="#Basics of Use">Basics of Use</a><br>
-      <a href="#custom road parts">Custom Road Parts</a><br>
-      <a href="#custom roadways">Custom Roadways</a><br>
+      <a href="#basics-of-use">Basics of Use</a><br>
+      <a href="#custom-road-parts">Custom Road Parts</a><br>
+      <a href="#custom-roadways">Custom Roadways</a><br>
     <a href="#roadmap">- Roadmap -</a><br>
     <a href="#technical">- Technicals -</a><br>
     <a href="#license">- License -</a><br>
@@ -54,5 +55,6 @@ This UML diagram needs to be remade, but it gives an outline.
   </a>
 
 ## License
+Camden - email@example.com
 
 ## Contact

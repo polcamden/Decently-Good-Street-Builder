@@ -1,7 +1,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/polcamden/Decently-Good-Street-Builder">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="Images/Readme/logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Decently Good Street Builder</h3>
@@ -49,10 +49,9 @@ Todo
 
 ## Technical
 This UML diagram needs to be remade, but it gives an outline. 
-<!--<a href="https://github.com/polcamden/Decently-Good-Street-Builder">
-    <img src="images/UML.png" alt="UML Diagram" width="80" height="80">
-  </a
-  -->
+<a href="https://github.com/polcamden/Decently-Good-Street-Builder">
+    <img src="Images/Readme/UML.png" alt="UML Diagram">
+  </a>
 
 ## License
 

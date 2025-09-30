@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -73,7 +74,20 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		{
 			return data[i];
 		}
-	
+
+		public RoadwayData FindDataByType(Type type)
+		{
+			for (int i = 0; i < data.Count; i++)
+			{
+				if (data[i].GetType() == type)
+				{
+					return data[i];
+				}
+			}
+
+			return null;
+		}
+
 		/*public void UpdateSegmentsRoadway(Segment segment, Mesh mesh, Dictionary<RoadwayData, List<GameObject>> dataToGameobjects)
 		{
 			bool[] exists = new bool[dataToGameobjects.Count];

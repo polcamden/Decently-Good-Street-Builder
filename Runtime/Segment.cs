@@ -41,6 +41,11 @@ namespace DecentlyGoodStreetBuilder
         {
             return handle[i].Position;
         }
+        
+        public Vector3 GetHandleWorldPosition(Node node)
+        {
+            return node == connection[0] ? handle[0].Position : handle[1].Position;
+        }
         public void SetHandleWorldPosition(int i, Vector3 value)
         {
             handle[i].Position = value;
@@ -63,11 +68,14 @@ namespace DecentlyGoodStreetBuilder
 
         //End Point
         [SerializeField] private Vector3[] endPoints;
-        public Vector3 endPointsWorldPosition(int i)
+        public Vector3 GetEndPointsWorldPosition(int i)
         {
             return connection[i].Position + endPoints[i];
         }
-
+        public Vector3 GetEndPointsWorldPosition(Node node)
+        {
+            return connection[0] == node ? GetEndPointsWorldPosition(0) : GetEndPointsWorldPosition(1);
+        }
         public void SetEndPointRelativeToNode(Node node, Vector3 position)
         {
             int i = node == connection[0] ? 0 : 1;
@@ -273,8 +281,8 @@ namespace DecentlyGoodStreetBuilder
             Vector3 h1 = handle[0].Position - Position;
             Vector3 h2 = handle[1].Position - Position;*/
 
-			Vector3 a1 = endPointsWorldPosition(0) - Position;
-			Vector3 a2 = endPointsWorldPosition(1) - Position;
+			Vector3 a1 = GetEndPointsWorldPosition(0) - Position;
+			Vector3 a2 = GetEndPointsWorldPosition(1) - Position;
 			Vector3 h1 = GetHandleWorldPosition(0) - Position;
 			Vector3 h2 = GetHandleWorldPosition(1) - Position;
 
@@ -286,8 +294,8 @@ namespace DecentlyGoodStreetBuilder
         /// </summary>
         private void CalculateCurve()
         {
-            Vector3 a1 = endPointsWorldPosition(0);
-            Vector3 a2 = endPointsWorldPosition(1);
+            Vector3 a1 = GetEndPointsWorldPosition(0);
+            Vector3 a2 = GetEndPointsWorldPosition(1);
             Vector3 h1 = GetHandleWorldPosition(0);
             Vector3 h2 = GetHandleWorldPosition(1);
 
@@ -328,7 +336,7 @@ namespace DecentlyGoodStreetBuilder
                 }
                 else if (curveType == SegmentCurveType.Straight || curveType == SegmentCurveType.Curve)
                 {
-                    Vector3 h1 = Vector3.Lerp(endPointsWorldPosition(0), endPointsWorldPosition(1), (i+1) / 3f);
+                    Vector3 h1 = Vector3.Lerp(GetEndPointsWorldPosition(0), GetEndPointsWorldPosition(1), (i+1) / 3f);
                     SetHandleWorldPosition(i, h1);
                 }
             }

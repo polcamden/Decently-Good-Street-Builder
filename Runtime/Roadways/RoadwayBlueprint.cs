@@ -35,8 +35,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			parts.Add(part);
 			RoadwayData d = part.CreateDataObject();
 
-			//AssetDatabase.AddObjectToAsset(d, this);
-			//AssetDatabase.SaveAssets();
+			AssetDatabase.AddObjectToAsset(d, this);
+			AssetDatabase.SaveAssets();
 
 			data.Add(d);
 		}
@@ -49,8 +49,8 @@ namespace DecentlyGoodStreetBuilder.Roadway
 		{
 			parts.RemoveAt(i);
 
-			//AssetDatabase.RemoveObjectFromAsset(data[i]);
-			//AssetDatabase.SaveAssets();
+			AssetDatabase.RemoveObjectFromAsset(data[i]);
+			AssetDatabase.SaveAssets();
 
 			data.RemoveAt(i);
 		}

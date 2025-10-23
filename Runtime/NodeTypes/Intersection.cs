@@ -10,7 +10,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     {
         [SerializeField] float radius = 6;
 
-        public override void Draw()
+        public override void Draw(string[] args)
         {
             
         }

@@ -7,7 +7,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     /// </summary>
     public class Disjointed : NodeType
     {
-        public override void Draw()
+        public override void Draw(string[] args)
         {
             
         }

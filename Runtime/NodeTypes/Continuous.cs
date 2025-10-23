@@ -13,15 +13,18 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         [SerializeField] float mergeDistance = 7;
         [SerializeField] bool merge = true;
 
-        public override void Draw()
+        [Range(0f, 1f)]
+        [SerializeField] float c1LeftTransition = 0.5f;
+		[Range(0f, 1f)]
+		[SerializeField] float c1rightTransition = 0.5f;
+
+		public override void Draw(string[] args)
         {
 			if (MyNode.ConnectionCount != 2)
 				return;
 
 			Segment s1 = MyNode.GetConnectionLink(0);
 			Segment s2 = MyNode.GetConnectionLink(1);
-
-			Mesh mesh = null;
 
 			if (s1.Roadway != null && s2.Roadway != null && s1.Roadway != s2.Roadway)
 			{
@@ -32,19 +35,38 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
 				if (data1 != null && data2 != null)
 				{
-                    //Vector3 mergeNormal = GeometryF.Normal(s1.GetHandleWorldPosition(MyNode), s2.GetHandleWorldPosition(MyNode));
+                    Vector3 a1 = s1.GetEndPointWorldPosition(MyNode);
+                    Vector3 a2 = s2.GetEndPointWorldPosition(MyNode);
 
-                    Vector3 a1 = s1.GetEndPointsWorldPosition(MyNode);
-                    Vector3 a2 = s1.GetEndPointsWorldPosition(MyNode);
+                    Vector3 s1Normal = GeometryF.Normal(s1.GetEndPointWorldPosition(MyNode), s1.GetHandleWorldPosition(MyNode));
+                    Vector3 s2Normal = GeometryF.Normal(s2.GetEndPointWorldPosition(MyNode), s2.GetHandleWorldPosition(MyNode));
 
-                    Vector3 s1Normal = GeometryF.Normal(s1.GetEndPointsWorldPosition(MyNode), s1.GetHandleWorldPosition(MyNode));
-                    Vector3 s2Normal = GeometryF.Normal(s2.GetEndPointsWorldPosition(MyNode), s2.GetHandleWorldPosition(MyNode));
+                    Vector3 s1x, s1y;
+                    (s1x, s1y) = GeometryF.GetOrthogonalPlane(s1Normal, s1.getAngle(MyNode));
 
-                    float dist = Vector3.Distance();
+					Vector3 s2x, s2y;
+					(s2x, s2y) = GeometryF.GetOrthogonalPlane(s2Normal, s2.getAngle(MyNode));
 
-                    Vector2[] r1points = data1.CrossSectionPoints();
+					Vector2[] s1points = data1.CrossSectionPoints();
+                    Vector2[] s2points = data2.CrossSectionPoints();
 
-                    Handles.DrawBezier(data1.);
+                    Vector3[] s1WorldPoints = GeometryF.Vector2sToPlane(s1points, s1x, s1y, a1);
+					Vector3[] s2WorldPoints = GeometryF.Vector2sToPlane(s2points, s2x, s2y, a2);
+
+					for (int i = 0; i < s1WorldPoints.Length; i++)
+                    {
+						Handles.SphereHandleCap(0, s1WorldPoints[i], Quaternion.identity, 0.1f, EventType.Repaint);
+					}
+
+					for (int i = 0; i < s2WorldPoints.Length; i++)
+					{
+						Handles.SphereHandleCap(0, s2WorldPoints[i], Quaternion.identity, 0.1f, EventType.Repaint);
+					}
+
+                    for (int i = 0; i < s2WorldPoints.Length; i++)
+                    {
+                        Handles.DrawLine(s1WorldPoints[i], s2WorldPoints[3 - i]);
+                    }
 				}
 			}
 		}

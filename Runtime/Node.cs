@@ -57,7 +57,12 @@ namespace DecentlyGoodStreetBuilder
             }
             
             Handles.SphereHandleCap(0, Position, Quaternion.identity, HANDLE_SIZE, EventType.Repaint);
-        }
+
+			if (nodeType != null)
+			{
+                nodeType.Draw(args);
+			}
+		}
 
         public override ISelectable[] Selected()
         {

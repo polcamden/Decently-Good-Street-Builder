@@ -18,7 +18,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 			this.myNode = myNode;
 		}
 
-        public abstract void Draw();
+        public abstract void Draw(string[] args);
 
         public abstract void HandleUpdate(); 
 

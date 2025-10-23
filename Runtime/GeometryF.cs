@@ -306,5 +306,39 @@ namespace DecentlyGoodStreetBuilder
 			t *= Mathf.PI;
 			return -Mathf.Cos(t) * 0.5f + 0.5f;
 		}
+	
+		/// <summary>
+		/// normal will be the z-axis, x-axis is NormalLeft, y-axis is cross of z and x
+		/// </summary>
+		/// <param name="normal"></param>
+		/// <param name="angle"></param>
+		/// <returns>x-axis, y-axis</returns>
+		public static (Vector3, Vector3) GetOrthogonalPlane(Vector3 normal, float angle)
+		{
+			Vector3 x = NormalLeft(normal, angle);
+			Vector3 y = Vector3.Cross(normal, x);
+
+			return (x, y);
+		}
+
+		/// <summary>
+		/// Places points on xy-plane positions at origin
+		/// </summary>
+		/// <param name="points"></param>
+		/// <param name="xAxis">normalized</param>
+		/// <param name="yAxis">normalized othogonal to xAxis</param>
+		/// <param name="origin">Origin of x-y plane</param>
+		/// <returns></returns>
+		public static Vector3[] Vector2sToPlane(Vector2[] points, Vector3 xAxis, Vector3 yAxis, Vector3 origin)
+		{
+			Vector3[] p = new Vector3[points.Length];
+
+			for (int i = 0; i < points.Length; i++)
+			{
+				p[i] = xAxis * points[i].x + yAxis * points[i].y + origin;
+			}
+
+			return p;
+		}
 	}
 }

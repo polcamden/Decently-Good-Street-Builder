@@ -8,7 +8,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     /// </summary>
     public class EndPoint : NodeType
     {
-        public override void Draw()
+        public override void Draw(string[] args)
         {
             
         }

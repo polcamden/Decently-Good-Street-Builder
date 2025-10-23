@@ -1,7 +1,9 @@
+using System.Linq;
 using DecentlyGoodStreetBuilder.Roadway;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace DecentlyGoodStreetBuilder.NodeTypes
 {
@@ -14,14 +16,19 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         [SerializeField] bool merge = true;
 
         [Range(0f, 1f)]
-        [SerializeField] float c1LeftTransition = 0.5f;
+        [SerializeField] float leftTransition = 0.5f;
 		[Range(0f, 1f)]
-		[SerializeField] float c1rightTransition = 0.5f;
+		[SerializeField] float rightTransition = 0.5f;
 
 		public override void Draw(string[] args)
         {
+            if (!args.Contains<string>("selected"))
+                return;
+
 			if (MyNode.ConnectionCount != 2)
 				return;
+
+            Handles.color = Color.blue;
 
 			Segment s1 = MyNode.GetConnectionLink(0);
 			Segment s2 = MyNode.GetConnectionLink(1);
@@ -63,10 +70,17 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 						Handles.SphereHandleCap(0, s2WorldPoints[i], Quaternion.identity, 0.1f, EventType.Repaint);
 					}
 
-                    for (int i = 0; i < s2WorldPoints.Length; i++)
-                    {
-                        Handles.DrawLine(s1WorldPoints[i], s2WorldPoints[3 - i]);
-                    }
+					//Vector3 leftHandlePos = Vector3.Lerp(s1WorldPoints[0], s2WorldPoints[3], leftTransition);
+
+					leftTransition = Slider(s1WorldPoints[0], s2WorldPoints[3], leftTransition);
+
+
+					float s1Dist = Vector3.Distance(s1WorldPoints[0], s2WorldPoints[3]);
+
+                    Vector3 handle1 = s1WorldPoints[0] - s1Normal * s1Dist * leftTransition;
+                    Vector3 handle2 = s2WorldPoints[3] - s2Normal * s1Dist * (1 - leftTransition);
+
+                    Handles.DrawBezier(s1WorldPoints[0], s2WorldPoints[3], handle1, handle2, Color.white, null, 2);
 				}
 			}
 		}
@@ -126,6 +140,39 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 				s1.SetEndPointRelativeToNode(MyNode, Vector3.zero);
 				s2.SetEndPointRelativeToNode(MyNode, Vector3.zero);
 			}
+        }
+
+        public float Slider(Vector3 start, Vector3 end, float t)
+        {
+            Vector3 sliderPos = Vector3.Lerp(start, end, t);
+
+			EditorGUI.BeginChangeCheck();
+			sliderPos = Handles.Slider(sliderPos, (end - start).normalized, 0.2f, Handles.SphereHandleCap, 0.1f);
+			if (EditorGUI.EndChangeCheck())
+			{
+				float lineLength = Vector3.Distance(start, end);
+				return Mathf.Clamp01(Vector3.Dot(sliderPos - start, (end - start).normalized) / lineLength);
+			}
+
+            return t;
+		}
+
+        public Vector3[] GetEndingVerts(int connectionIndex)
+        {
+			Segment s1 = MyNode.GetConnectionLink(connectionIndex);
+            if(s1 != null && s1.Roadway != null)
+            {
+				CarriagewayMeshData data = (CarriagewayMeshData)s1.Roadway.FindDataByType(typeof(CarriagewayMeshData));
+
+                if (data != null)
+                {
+					//Vector3 anchor = s1.GetEndPointsRelativeToNode(MyNode);
+                    //Vector3 handle = s1.Ge;
+
+				}
+			}
+
+			return null;
         }
     }
 }

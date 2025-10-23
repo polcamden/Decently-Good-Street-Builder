@@ -76,7 +76,10 @@ namespace DecentlyGoodStreetBuilder
         {
             return connection[0] == node ? GetEndPointWorldPosition(0) : GetEndPointWorldPosition(1);
         }
-
+        public Vector3 GetEndPointsRelativeToNode(Node node)
+        {
+            return node == connection[0] ? endPoints[0] : endPoints[1];
+        }
         public void SetEndPointRelativeToNode(Node node, Vector3 position)
         {
             int i = node == connection[0] ? 0 : 1;

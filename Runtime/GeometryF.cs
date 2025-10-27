@@ -27,8 +27,6 @@ namespace DecentlyGoodStreetBuilder
 		/// <returns></returns>
 		public static Vector3 NormalLeft(Vector3 normal, float angle)
 		{
-			//forward.Normalize();
-
 			Quaternion flatLeft = Quaternion.AngleAxis(90, Vector3.up);
 			Vector3 flatForward = new Vector3(normal.x, 0, normal.z);
 			Vector3 left = flatLeft * flatForward;
@@ -313,12 +311,16 @@ namespace DecentlyGoodStreetBuilder
 		/// <param name="normal"></param>
 		/// <param name="angle"></param>
 		/// <returns>x-axis, y-axis</returns>
-		public static (Vector3, Vector3) GetOrthogonalPlane(Vector3 normal, float angle)
+		public static Matrix4x4 GetOrthogonalPlane(Vector3 position, Vector3 normal, float angle)
 		{
-			Vector3 x = NormalLeft(normal, angle);
-			Vector3 y = Vector3.Cross(normal, x);
+			Vector4 x = NormalLeft(normal, angle);
+			Vector4 y = Vector3.Cross(normal, x);
+			Vector4 z = normal;
+			Vector4 w = new Vector4(position.x, position.y, position.z, 1);
 
-			return (x, y);
+			Matrix4x4 transform = new Matrix4x4(x, y, z, w);
+
+			return transform;
 		}
 
 		/// <summary>
@@ -329,13 +331,15 @@ namespace DecentlyGoodStreetBuilder
 		/// <param name="yAxis">normalized othogonal to xAxis</param>
 		/// <param name="origin">Origin of x-y plane</param>
 		/// <returns></returns>
-		public static Vector3[] Vector2sToPlane(Vector2[] points, Vector3 xAxis, Vector3 yAxis, Vector3 origin)
+		public static Vector3[] Vector2sToPlane(Vector2[] points, Matrix4x4 transform)
 		{
 			Vector3[] p = new Vector3[points.Length];
 
 			for (int i = 0; i < points.Length; i++)
 			{
-				p[i] = xAxis * points[i].x + yAxis * points[i].y + origin;
+				Vector3 point = new Vector3(points[i].x, points[i].y, 0);
+
+				p[i] = transform.MultiplyPoint3x4(point);
 			}
 
 			return p;

@@ -311,7 +311,7 @@ namespace DecentlyGoodStreetBuilder
 		/// <param name="normal"></param>
 		/// <param name="angle"></param>
 		/// <returns>x-axis, y-axis</returns>
-		public static Matrix4x4 GetOrthogonalPlane(Vector3 position, Vector3 normal, float angle)
+		public static Matrix4x4 OrthogonalToTransform(Vector3 position, Vector3 normal, float angle)
 		{
 			Vector4 x = NormalLeft(normal, angle);
 			Vector4 y = Vector3.Cross(normal, x);

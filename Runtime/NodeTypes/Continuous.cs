@@ -35,52 +35,22 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
 			if (s1.Roadway != null && s2.Roadway != null && s1.Roadway != s2.Roadway)
 			{
-				RoadwayBlueprint r1 = s1.Roadway;
-				RoadwayBlueprint r2 = s2.Roadway;
-				CarriagewayMeshData data1 = (CarriagewayMeshData)r1.FindDataByType(typeof(CarriagewayMeshData));
-				CarriagewayMeshData data2 = (CarriagewayMeshData)r2.FindDataByType(typeof(CarriagewayMeshData));
+                Vector3[] p1World = GetEndingVerts(0);
+                Vector3[] p2World = GetEndingVerts(1);
 
-				if (data1 != null && data2 != null)
-				{
-                    Vector3 a1 = s1.GetEndPointWorldPosition(MyNode);
-                    Vector3 a2 = s2.GetEndPointWorldPosition(MyNode);
+                Debug.Log(p1World);
 
-                    Vector3 s1Normal = GeometryF.Normal(s1.GetEndPointWorldPosition(MyNode), s1.GetHandleWorldPosition(MyNode));
-                    Vector3 s2Normal = GeometryF.Normal(s2.GetEndPointWorldPosition(MyNode), s2.GetHandleWorldPosition(MyNode));
+                if(p1World != null && p2World != null)
+                {
+                    Vector3 p1LeftMid = Vector3.Lerp(p1World[0], p1World[1], 0.5f);
+                    Vector3 p1RightMid = Vector3.Lerp(p1World[2], p1World[3], 0.5f);
+                    Vector3 p2LeftMid = Vector3.Lerp(p2World[2], p2World[3], 0.5f);
+                    Vector3 p2RightMid = Vector3.Lerp(p2World[0], p2World[1], 0.5f);
 
-                    Vector3 s1x, s1y;
-                    (s1x, s1y) = GeometryF.GetOrthogonalPlane(s1Normal, s1.getAngle(MyNode));
+					leftTransition = Slider(p1LeftMid, p2LeftMid, leftTransition);
+                    rightTransition = Slider(p1RightMid, p2RightMid, rightTransition);
 
-					Vector3 s2x, s2y;
-					(s2x, s2y) = GeometryF.GetOrthogonalPlane(s2Normal, s2.getAngle(MyNode));
-
-					Vector2[] s1points = data1.CrossSectionPoints();
-                    Vector2[] s2points = data2.CrossSectionPoints();
-
-                    Vector3[] s1WorldPoints = GeometryF.Vector2sToPlane(s1points, s1x, s1y, a1);
-					Vector3[] s2WorldPoints = GeometryF.Vector2sToPlane(s2points, s2x, s2y, a2);
-
-					for (int i = 0; i < s1WorldPoints.Length; i++)
-                    {
-						Handles.SphereHandleCap(0, s1WorldPoints[i], Quaternion.identity, 0.1f, EventType.Repaint);
-					}
-
-					for (int i = 0; i < s2WorldPoints.Length; i++)
-					{
-						Handles.SphereHandleCap(0, s2WorldPoints[i], Quaternion.identity, 0.1f, EventType.Repaint);
-					}
-
-					//Vector3 leftHandlePos = Vector3.Lerp(s1WorldPoints[0], s2WorldPoints[3], leftTransition);
-
-					leftTransition = Slider(s1WorldPoints[0], s2WorldPoints[3], leftTransition);
-
-
-					float s1Dist = Vector3.Distance(s1WorldPoints[0], s2WorldPoints[3]);
-
-                    Vector3 handle1 = s1WorldPoints[0] - s1Normal * s1Dist * leftTransition;
-                    Vector3 handle2 = s2WorldPoints[3] - s2Normal * s1Dist * (1 - leftTransition);
-
-                    Handles.DrawBezier(s1WorldPoints[0], s2WorldPoints[3], handle1, handle2, Color.white, null, 2);
+					float s1Dist = Vector3.Distance(p1World[0], p2World[3]);
 				}
 			}
 		}
@@ -159,16 +129,24 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public Vector3[] GetEndingVerts(int connectionIndex)
         {
-			Segment s1 = MyNode.GetConnectionLink(connectionIndex);
-            if(s1 != null && s1.Roadway != null)
+			Segment s = MyNode.GetConnectionLink(connectionIndex);
+            if(s != null && s.Roadway != null)
             {
-				CarriagewayMeshData data = (CarriagewayMeshData)s1.Roadway.FindDataByType(typeof(CarriagewayMeshData));
+				CarriagewayMeshData data = (CarriagewayMeshData)s.Roadway.FindDataByType(typeof(CarriagewayMeshData));
 
                 if (data != null)
                 {
-					//Vector3 anchor = s1.GetEndPointsRelativeToNode(MyNode);
-                    //Vector3 handle = s1.Ge;
+                    Vector2[] endPointsPlane = data.CrossSectionPoints();
 
+					Vector3 anchor = s.GetEndPointWorldPosition(MyNode);
+                    Vector3 handle = GeometryF.Normal(s.GetEndPointWorldPosition(MyNode), s.GetHandleWorldPosition(MyNode));
+                    float angle = s.getAngle(MyNode);
+
+                    Matrix4x4 transform = GeometryF.OrthogonalToTransform(anchor, handle, angle);
+
+                    Vector3[] points = GeometryF.Vector2sToPlane(endPointsPlane, transform);
+
+                    return points;
 				}
 			}
 

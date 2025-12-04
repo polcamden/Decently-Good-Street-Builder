@@ -310,7 +310,7 @@ namespace DecentlyGoodStreetBuilder
 
             CubicBezierCurve bez = new CubicBezierCurve(a1, a2, h1, h2);
 
-            curve = bez.curvePoints(1);
+            curve = bez.CurvePoints(1f);
         }
 
         /// <summary>

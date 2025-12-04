@@ -34,11 +34,11 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
             mesh.Clear();
 
             mesh = GenerateSurfaceMesh();
-            if (mesh != null)
+            /*if (mesh != null) TODO: commented out for mesh debuging
             {
                 mesh.RecalculateBounds();
                 mesh.Optimize();
-            }
+            }*/
 
 			Material[] materials = new Material[] { surfaceMaterial };
 

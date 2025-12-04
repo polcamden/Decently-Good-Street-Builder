@@ -41,7 +41,7 @@ public struct CubicBezierCurve
     /// <returns></returns>
     public (Vector3[], Vector3[]) curvePointsSpine(float resolution)
     {
-        Vector3[] points = curvePoints(resolution);
+        Vector3[] points = CurvePoints(resolution);
         Vector3[] spine = curveSpine(points);
 
         return (points, spine);
@@ -52,14 +52,14 @@ public struct CubicBezierCurve
     /// </summary>
     /// <param name="resolution"></param>
     /// <returns></returns>
-    public Vector3[] curvePoints(float resolution)
+    public Vector3[] CurvePoints(float resolution)
     {
         //get length
         float curveDist = 0;
         Vector3 prevPoint = anchor1;
         for (int i = 1; i < 50; i++)
         {
-            Vector3 point = CubicBezierCurvePoint(i / 50f);
+            Vector3 point = GetPoint(i / 50f);
             curveDist += Vector3.Distance(prevPoint, point);
             prevPoint = point;
         }
@@ -75,7 +75,7 @@ public struct CubicBezierCurve
 
         for (int i = 0; i < 1000; i++)
         {
-            Vector3 p = CubicBezierCurvePoint(i / 1000f);
+            Vector3 p = GetPoint(i / 1000f);
             if (Vector3.Distance(points[points.Count - 1], p) >= fixedResolution)
             {
                 points.Add(p);
@@ -86,6 +86,21 @@ public struct CubicBezierCurve
         points.Add(anchor2);
 
         return points.ToArray();
+    }
+
+    public Vector3[] CurvePoints(int count)
+    {
+        float step = 1f / (count - 1);
+        float t = 0;
+        Vector3[] points = new Vector3[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            points[i] = GetPoint(t);
+            t += step;
+        }
+
+        return points;
     }
 
     /// <summary>
@@ -131,7 +146,7 @@ public struct CubicBezierCurve
         Vector3 p0 = anchor1;
         for (float i = 0; i <= 1; i += 0.1f)
         {
-            Vector3 p1 = CubicBezierCurvePoint(i);
+            Vector3 p1 = GetPoint(i);
             dist += Vector3.Distance(p0, p1);
             p0 = p1;
         }
@@ -148,7 +163,7 @@ public struct CubicBezierCurve
     /// <param name="h2"></param>
     /// <param name="t"></param>
     /// <returns></returns>
-    private Vector3 CubicBezierCurvePoint(float t)
+    private Vector3 GetPoint(float t)
     {
         Vector3 p3 = Vector3.Lerp(handle1, handle2, t);
         return Vector3.Lerp(Vector3.Lerp(
@@ -169,7 +184,7 @@ public struct CubicBezierCurve
     public CubicBezierCurve offsetCurve(float offset)
     {
         Vector3 left1 = GeometryF.NormalLeft(handle1 - anchor1, angle1);
-        Vector3 left2 = GeometryF.NormalLeft(handle2 + anchor2, angle2);
+        Vector3 left2 = -GeometryF.NormalLeft(handle2 - anchor2, angle2);
 
         Vector3 a1 = anchor1 + left1 * offset;
         Vector3 a2 = anchor2 + left2 * offset;

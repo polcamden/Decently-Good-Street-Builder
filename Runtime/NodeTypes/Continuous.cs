@@ -41,12 +41,18 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 Vector3[] p1World = GetEndingVerts(0);
                 Vector3[] p2World = GetEndingVerts(1);
 
+                for (int i = 0; i < p1World.Length; i++)
+                {
+                    Handles.Label(p1World[i], $"p1[{i}]");
+                    Handles.Label(p2World[i], $"p2[{i}]");
+                }
+
                 if(p1World != null && p2World != null)
                 {
-                    Vector3 p1LeftMid = p1World[2];
-                    Vector3 p1RightMid = p1World[3];
-                    Vector3 p2LeftMid = p2World[3];
-                    Vector3 p2RightMid = p2World[2];
+                    Vector3 p1LeftMid = p1World[0];
+                    Vector3 p1RightMid = p1World[1];
+                    Vector3 p2LeftMid = p2World[1];
+                    Vector3 p2RightMid = p2World[0];
 
                     Handles.DrawDottedLine(p1LeftMid, p2LeftMid, 2);
                     Handles.DrawDottedLine(p1RightMid, p2RightMid, 2);
@@ -55,25 +61,27 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                     rightTransition = Slider(p1RightMid, p2RightMid, rightTransition);
 				}
 
-
                 //TESTING
                 Vector3[] p1Ends = p1World;
                 Vector3[] p2Ends = p2World;
 
 				CubicBezierCurve[] curves = new CubicBezierCurve[4];
 
-				Vector3 p1NormalPush = GetEndingNormal(0) * mergeDistance / 2;
-				Vector3 p2NormalPush = GetEndingNormal(1) * mergeDistance / 2;
+				Vector3 p1LeftPush = GetEndingNormal(0) * mergeDistance * leftTransition;
+				Vector3 p1RightPush = GetEndingNormal(0) * mergeDistance * rightTransition;
+				Vector3 p2LeftPush = GetEndingNormal(1) * mergeDistance * (1 - leftTransition);
+				Vector3 p2RightPush = GetEndingNormal(1) * mergeDistance * (1 - rightTransition);
 
-				for (int i = 0; i < 2; i += 2)
+				for (int i = 0; i < 4; i += 2)
 				{
 					Vector3 leftP1 = i >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
+                    Vector3 rightP1 = i + 1 >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i + 1];
+
 					Vector3 leftP2 = i >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
-					Vector3 rightP1 = i + 1 >= p1Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
 					Vector3 rightP2 = i + 1 >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
 
-					curves[i] = new CubicBezierCurve(leftP1, leftP2, leftP1 + p1NormalPush, leftP2 + p2NormalPush);
-					curves[i + 1] = new CubicBezierCurve(rightP1, rightP2, rightP1 + p1NormalPush, rightP2 + p2NormalPush);
+					curves[i] = new CubicBezierCurve(leftP1, rightP2, leftP1 + p1LeftPush, rightP2 + p2LeftPush);
+					curves[i + 1] = new CubicBezierCurve(rightP1, leftP2, rightP1 + p1RightPush, leftP2 + p2RightPush);
 				}
 
                 for (int i = 0; i < curves.Length; i++)
@@ -85,7 +93,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public override Mesh GenerateSurfaceMesh()
         {
-            if(MyNode.ConnectionCount != 2)
+            if(MyNode.ConnectionCount != 2 || !merge)
                 return null;
 
 			Vector3[] p1Ends = GetEndingVerts(0);
@@ -116,27 +124,45 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 			Segment s1 = MyNode.GetConnectionLink(0);
 			Segment s2 = MyNode.GetConnectionLink(1);
 
-			Vector3 p1NormalPush = GetEndingNormal(0) * mergeDistance / 2;
-            Vector3 p2NormalPush = GetEndingNormal(1) * mergeDistance / 2;
+			Vector3 p1LeftPush = GetEndingNormal(0) * mergeDistance * leftTransition;
+            Vector3 p1RightPush = GetEndingNormal(0) * mergeDistance * rightTransition;
+            Vector3 p2LeftPush = GetEndingNormal(1) * mergeDistance * (1 - leftTransition);
+            Vector3 p2RightPush = GetEndingNormal(1) * mergeDistance * (1 - rightTransition);
 
 			for (int i = 0; i < curves.Length; i+=2)
             {
-                Vector3 leftP1  = i >= p1Ends.Length   ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
-                Vector3 leftP2  = i >= p1Ends.Length   ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
-                Vector3 rightP1 = i+1 >= p1Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i+1];
-				Vector3 rightP2 = i+1 >= p1Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i+1];
+                Vector3 leftP1 = i >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
+                Vector3 rightP1 = i + 1 >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i + 1];
 
-                curves[i] = new CubicBezierCurve(leftP1, leftP2, leftP1 + p1NormalPush, leftP2 + p2NormalPush);
-                curves[i+1] = new CubicBezierCurve(rightP1, rightP2, rightP1 + p1NormalPush, rightP2 + p2NormalPush);
+                Vector3 leftP2 = i >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
+                Vector3 rightP2 = i + 1 >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
+
+                curves[i] = new CubicBezierCurve(leftP1, rightP2, leftP1 + p1LeftPush, rightP2 + p2LeftPush);
+                curves[i + 1] = new CubicBezierCurve(rightP1, leftP2, rightP1 + p1RightPush, leftP2 + p2RightPush);
             }
-
-
 
 			Vector3[] verts = new Vector3[topEndsCount * subDivision];
 			int[] trigs = new int[verts.Length * 6];
 
+            Vector3[] leftVert = curves[0].CurvePoints(subDivision);
+            Vector3[] rightVert = curves[1].CurvePoints(subDivision);
 
+            int ri = leftVert.Length; 
+            for (int li = 0; li < leftVert.Length - 1; li++)
+            {
+                int trigI = li * 6;
+                trigs[trigI] = li;
+                trigs[trigI + 1] = li + 1;
+                trigs[trigI + 2] = ri;
+                trigs[trigI + 3] = ri;
+                trigs[trigI + 4] = li + 1;
+                trigs[trigI + 5] = ri + 1;
 
+                ri++;
+            }
+
+            Array.Copy(leftVert, verts, leftVert.Length);
+            Array.Copy(rightVert, 0, verts, leftVert.Length, leftVert.Length);
 
 			Mesh mesh = new Mesh();
             mesh.vertices = verts;

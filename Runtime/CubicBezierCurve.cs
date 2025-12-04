@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DecentlyGoodStreetBuilder;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -176,5 +177,10 @@ public struct CubicBezierCurve
         Vector3 h2 = handle2 + left2 * offset;
 
         return new CubicBezierCurve(a1, a2, h1, h2, angle1, angle2);
+    }
+
+    public void DrawUnityBezier(Color color, float width = 1)
+    {
+        Handles.DrawBezier(anchor1, anchor2, handle1, handle2, color, null, width);
     }
 }

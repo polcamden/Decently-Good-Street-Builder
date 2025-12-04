@@ -88,7 +88,9 @@ namespace DecentlyGoodStreetBuilder
             {
                 nodeType.HandleUpdate();
 			}
-        }
+
+            UpdateGameObject();
+		}
 
         /// <summary>
         /// Should only be called from Segment.Init
@@ -143,7 +145,28 @@ namespace DecentlyGoodStreetBuilder
                 nodeType.Init(this);
         }
 
-        public override void OnDestroy()
+		private void UpdateGameObject()
+		{
+			if (NodeType != null)
+			{
+				Mesh mesh = GameObject.GetComponent<MeshFilter>().sharedMesh;
+
+				if (mesh == null)
+				{
+					mesh = new Mesh();
+					GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+				}
+
+				Material[] materials;
+
+                (mesh, materials) = NodeType.GenerateRoadwayMesh(mesh);
+
+				GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+				GameObject.GetComponent<MeshRenderer>().materials = materials;
+			}
+		}
+
+		public override void OnDestroy()
         {
             for (int i = 0; i < ConnectionCount; i++)
             {

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using DecentlyGoodStreetBuilder.Roadway;
 using Unity.VisualScripting;
@@ -20,6 +21,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 		[Range(0f, 1f)]
 		[SerializeField] float rightTransition = 0.5f;
 
+        [SerializeField] int subDivision = 16;
+
 		public override void Draw(string[] args)
         {
             if (!args.Contains<string>("selected"))
@@ -38,52 +41,109 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 Vector3[] p1World = GetEndingVerts(0);
                 Vector3[] p2World = GetEndingVerts(1);
 
-                Debug.Log(p1World);
-
                 if(p1World != null && p2World != null)
                 {
-                    Vector3 p1LeftMid = Vector3.Lerp(p1World[0], p1World[1], 0.5f);
-                    Vector3 p1RightMid = Vector3.Lerp(p1World[2], p1World[3], 0.5f);
-                    Vector3 p2LeftMid = Vector3.Lerp(p2World[2], p2World[3], 0.5f);
-                    Vector3 p2RightMid = Vector3.Lerp(p2World[0], p2World[1], 0.5f);
+                    Vector3 p1LeftMid = p1World[2];
+                    Vector3 p1RightMid = p1World[3];
+                    Vector3 p2LeftMid = p2World[3];
+                    Vector3 p2RightMid = p2World[2];
+
+                    Handles.DrawDottedLine(p1LeftMid, p2LeftMid, 2);
+                    Handles.DrawDottedLine(p1RightMid, p2RightMid, 2);
 
 					leftTransition = Slider(p1LeftMid, p2LeftMid, leftTransition);
                     rightTransition = Slider(p1RightMid, p2RightMid, rightTransition);
-
-					float s1Dist = Vector3.Distance(p1World[0], p2World[3]);
 				}
+
+
+                //TESTING
+                Vector3[] p1Ends = p1World;
+                Vector3[] p2Ends = p2World;
+
+				CubicBezierCurve[] curves = new CubicBezierCurve[4];
+
+				Vector3 p1NormalPush = GetEndingNormal(0) * mergeDistance / 2;
+				Vector3 p2NormalPush = GetEndingNormal(1) * mergeDistance / 2;
+
+				for (int i = 0; i < 2; i += 2)
+				{
+					Vector3 leftP1 = i >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
+					Vector3 leftP2 = i >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
+					Vector3 rightP1 = i + 1 >= p1Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
+					Vector3 rightP2 = i + 1 >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
+
+					curves[i] = new CubicBezierCurve(leftP1, leftP2, leftP1 + p1NormalPush, leftP2 + p2NormalPush);
+					curves[i + 1] = new CubicBezierCurve(rightP1, rightP2, rightP1 + p1NormalPush, rightP2 + p2NormalPush);
+				}
+
+                for (int i = 0; i < curves.Length; i++)
+                {
+                    curves[i].DrawUnityBezier(new Color(((float)i) / 4f, 1 - (((float)i) / 4f), 0.5f));
+                }
 			}
 		}
 
-        public override void GenerateMesh()
+        public override Mesh GenerateSurfaceMesh()
         {
             if(MyNode.ConnectionCount != 2)
-                return;
+                return null;
 
+			Vector3[] p1Ends = GetEndingVerts(0);
+			Vector3[] p2Ends = GetEndingVerts(1);
+
+            if (p1Ends == null || p2Ends == null)
+                return null;
+
+            ///Translate ends from world to local
+            Vector3 nodePos = MyNode.Position;
+            for (int i = 0; i < p1Ends.Length; i++)
+            {
+                p1Ends[i] = p1Ends[i] - nodePos;
+            }
+            for (int i = 0; i < p2Ends.Length; i++)
+            {
+				p2Ends[i] = p2Ends[i] - nodePos;
+			}
+
+            int topEndsCount = 4;
+            if (p1Ends.Length == 2 && p2Ends.Length == 2)
+            {
+                topEndsCount = 2;
+            }
+
+            //make curves between endPoints
+            CubicBezierCurve[] curves = new CubicBezierCurve[topEndsCount];
 			Segment s1 = MyNode.GetConnectionLink(0);
 			Segment s2 = MyNode.GetConnectionLink(1);
 
-            Mesh mesh = null;
+			Vector3 p1NormalPush = GetEndingNormal(0) * mergeDistance / 2;
+            Vector3 p2NormalPush = GetEndingNormal(1) * mergeDistance / 2;
 
-            if (s1.Roadway != null && s2.Roadway != null && s1.Roadway != s2.Roadway)
+			for (int i = 0; i < curves.Length; i+=2)
             {
-                RoadwayBlueprint r1 = s1.Roadway;
-				RoadwayBlueprint r2 = s2.Roadway;
-                CarriagewayMeshData data1 = (CarriagewayMeshData)r1.FindDataByType(typeof(CarriagewayMeshData));
-                CarriagewayMeshData data2 = (CarriagewayMeshData)r2.FindDataByType(typeof(CarriagewayMeshData));
+                Vector3 leftP1  = i >= p1Ends.Length   ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
+                Vector3 leftP2  = i >= p1Ends.Length   ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
+                Vector3 rightP1 = i+1 >= p1Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i+1];
+				Vector3 rightP2 = i+1 >= p1Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i+1];
 
-                if(data1 != null && data2 != null)
-                {
-					mesh = GenerateMerge(data1, data2);
-				}
-			}
-            
+                curves[i] = new CubicBezierCurve(leftP1, leftP2, leftP1 + p1NormalPush, leftP2 + p2NormalPush);
+                curves[i+1] = new CubicBezierCurve(rightP1, rightP2, rightP1 + p1NormalPush, rightP2 + p2NormalPush);
+            }
 
-        }
 
-        public Mesh GenerateMerge(CarriagewayMeshData data1, CarriagewayMeshData data2)
-        {
-            return null;
+
+			Vector3[] verts = new Vector3[topEndsCount * subDivision];
+			int[] trigs = new int[verts.Length * 6];
+
+
+
+
+			Mesh mesh = new Mesh();
+            mesh.vertices = verts;
+            mesh.triangles = trigs;
+			mesh.RecalculateNormals();
+
+			return mesh;
         }
 
         public override void HandleUpdate()
@@ -127,6 +187,11 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
             return t;
 		}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connectionIndex"></param>
+        /// <returns>reutrns array where the first pair of index 0 and 1 are the road surface</returns>
         public Vector3[] GetEndingVerts(int connectionIndex)
         {
 			Segment s = MyNode.GetConnectionLink(connectionIndex);
@@ -146,11 +211,31 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
                     Vector3[] points = GeometryF.Vector2sToPlane(endPointsPlane, transform);
 
+                    //flips order
+                    for (int i = 0; i < points.Length; i += 2)
+                    {
+                        Vector3 temp = points[i];
+                        points[i] = points[i + 1];
+                        points[i + 1] = temp;
+                    }
+
                     return points;
 				}
 			}
 
 			return null;
         }
+    
+        /// <summary>
+        /// points into node
+        /// </summary>
+        /// <returns></returns>
+        public Vector3 GetEndingNormal(int connectionIndex)
+        {
+			Segment s = MyNode.GetConnectionLink(connectionIndex);
+
+            return -GeometryF.Normal(s.GetEndPointWorldPosition(MyNode), s.GetHandleWorldPosition(MyNode));
+
+		}
     }
 }

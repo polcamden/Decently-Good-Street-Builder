@@ -12,9 +12,9 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
             
         }
 
-        public override void GenerateMesh()
+        public override Mesh GenerateSurfaceMesh()
         {
-            
+            return null;
         }
 
         public override void HandleUpdate()

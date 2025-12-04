@@ -21,9 +21,9 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			{
 				roadSlice = new Vector2[4];
 
-				roadSlice[1] = new Vector2(-halfWidth, 0);
-				roadSlice[2] = new Vector2(halfWidth, 0);
-				roadSlice[0] = new Vector2(-Mathf.Cos(angle) * marginSize, Mathf.Sin(angle) * marginSize) + roadSlice[1];
+				roadSlice[0] = new Vector2(-halfWidth, 0);
+				roadSlice[1] = new Vector2(halfWidth, 0);
+				roadSlice[2] = new Vector2(-Mathf.Cos(angle) * marginSize, Mathf.Sin(angle) * marginSize) + roadSlice[1];
 				roadSlice[3] = new Vector2(Mathf.Cos(angle) * marginSize, Mathf.Sin(angle) * marginSize) + roadSlice[2];
 			}
 			else

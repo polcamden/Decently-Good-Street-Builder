@@ -186,6 +186,7 @@ namespace DecentlyGoodStreetBuilder
 		public virtual void OnDestroy()
 		{
 			myElementGroup.RemoveStreetElement(this);
+			DestroyImmediate(gameObject);
         }
 
 		public virtual void OnPositionUndo(in UndoRedoInfo info)

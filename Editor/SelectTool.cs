@@ -108,11 +108,27 @@ namespace DecentlyGoodStreetBuilder.Editor
 			if (selected.Count == 1 && selected[0].GetType() == typeof(Segment))
 			{
 				menu.AppendAction("Change Roadway", (item) => ChangeRoadway());
+				menu.AppendAction("Remove Segment", (item) => DestroySelected());
+			}
+
+			if (selected.Count == 1 && selected[0].GetType() == typeof(Node))
+			{
+				menu.AppendAction("Remove Node", (item) => DestroySelected());
+			}
+
+			if(selected.Count == 2 && selected[0].GetType() == typeof(Node) && selected[1].GetType() == typeof(Node))
+			{
+				menu.AppendAction("Connect Nodes", (item) => Connect());
 			}
 
 			if(selected.Count == 1)
 			{
 				menu.AppendAction("Inspect Selected", (item) => InspectSelected());
+			}
+
+			if(selected.Count > 1)
+			{
+				menu.AppendAction("Remove Selected", (item) => DestroySelected());
 			}
 		}
 
@@ -135,10 +151,29 @@ namespace DecentlyGoodStreetBuilder.Editor
 			AssetLibrary.ShowWindow();
 		}
 
+		public void DestroySelected()
+        {
+            for (int i = 0; i < selected.Count; i++)
+            {
+                if (selected[i].GetType().IsSubclassOf(typeof(StreetElement)))
+                {
+                    DestroyImmediate((StreetElement)selected[i]);
+                }
+            }
+
+            selected.Clear();
+        }
+
 		public void InspectSelected()
 		{
 			EditorGUIUtility.PingObject((UnityEngine.Object)selected[0]);
 			Selection.activeObject = (UnityEngine.Object)selected[0];
 		}
+
+		public void Connect()
+        {
+			Segment seg = CreateInstance<Segment>();
+			seg.Init((Node)selected[0], (Node)selected[1], ((Node)selected[0]).MyStreetBuilder, null);
+        }
 	}
 }

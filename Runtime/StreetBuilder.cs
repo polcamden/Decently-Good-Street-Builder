@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 namespace DecentlyGoodStreetBuilder
 {
@@ -96,6 +97,14 @@ namespace DecentlyGoodStreetBuilder
             }
 
 			return element;
+		}
+
+		[MenuItem("GameObject/StreetBuilder", false, 10)]
+		static void CreateCustomCube(MenuCommand menuCommand)
+		{
+			GameObject obj = new GameObject();
+			obj.name = "StreetBuilder";
+			obj.AddComponent<StreetBuilder>();
 		}
 	}
 }

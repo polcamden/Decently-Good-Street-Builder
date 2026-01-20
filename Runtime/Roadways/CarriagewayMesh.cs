@@ -30,6 +30,7 @@ namespace DecentlyGoodStreetBuilder.Roadway {
 			float halfWidth = castedData.width / 2;
 			float angle = Mathf.Deg2Rad * -castedData.marginDegree;
 			float marginSize = castedData.marginSize;
+			CubicBezierCurve offsetCurve = curve.offsetCurve(data.offset);
 
 			Vector2[] roadSlice;
 			bool[] sharpVerts;
@@ -66,7 +67,7 @@ namespace DecentlyGoodStreetBuilder.Roadway {
 			}
 
 
-			return MeshArray.GenerateMeshGivenSlice(curve, resolution, roadSlice, sharpVerts, vAxis, resolution * textureScale);
+			return MeshArray.GenerateMeshGivenSlice(offsetCurve, resolution, roadSlice, sharpVerts, vAxis, resolution * textureScale);
 		}
 	}
 }

@@ -80,38 +80,8 @@ namespace DecentlyGoodStreetBuilder.Editor
             {
 				menu.AppendAction("Inspect Selected", (item) => InspectSelected());
 			}
-            else if (selected.Count == 2)
-            {
-                menu.AppendAction("Connect", (item) => MeshConnect());
-            }
-            else if (selected.Count >= 3)
-            {
-                //menu.AppendAction("Mesh Connect", (item) => MeshConnect());
-            }
-        }
 
-        public void MeshConnect()
-        {
-            if (selected.Count == 2)
-            {
-                //bad cast just testing
-                Segment seg = ScriptableObject.CreateInstance<Segment>();
-
-                seg.Init((Node)selected[0], (Node)selected[1], ((Node)selected[0]).MyStreetBuilder, null);
-            }
-        }
-
-        public void DestroySelected()
-        {
-            for (int i = 0; i < selected.Count; i++)
-            {
-                if (selected[i].GetType().IsSubclassOf(typeof(StreetElement)))
-                {
-                    DestroyImmediate((StreetElement)selected[i]);
-                }
-            }
-
-            selected.Clear();
+            base.PopulateMenu(menu);
         }
 	}
 }

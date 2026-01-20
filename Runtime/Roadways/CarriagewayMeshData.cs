@@ -7,9 +7,9 @@ namespace DecentlyGoodStreetBuilder.Roadway
         [SerializeField] public float width = 6;
         [SerializeField] public bool enableMargins = true;
 		[Range(0.01f, 10f)]
-		[SerializeField] public float marginSize = 3;
+		[SerializeField] public float marginSize = 1;
 		[Range(0, 90)]
-		[SerializeField] public float marginDegree = 45;
+		[SerializeField] public float marginDegree = 20;
 
 		public Vector2[] CrossSectionPoints()
 		{

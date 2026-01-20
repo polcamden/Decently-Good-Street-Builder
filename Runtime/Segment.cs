@@ -376,8 +376,6 @@ namespace DecentlyGoodStreetBuilder
 
         public override void OnDestroy()
         {
-			base.OnDestroy();
-
 			if (connection != null && connection[0] != null && connection[1] != null)
             {
                 connection[0].RemoveConnection(this);
@@ -385,6 +383,8 @@ namespace DecentlyGoodStreetBuilder
             }
 
 			UpdateAdjacents();
+
+            base.OnDestroy();
 		}
     }
 

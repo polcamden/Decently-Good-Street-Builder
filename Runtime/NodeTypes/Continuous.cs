@@ -72,7 +72,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 				Vector3 p2LeftPush = GetEndingNormal(1) * mergeDistance * (1 - leftTransition);
 				Vector3 p2RightPush = GetEndingNormal(1) * mergeDistance * (1 - rightTransition);
 
-				for (int i = 0; i < 4; i += 2)
+				for (int i = 0; i < 4; i += 2) //TODO: I dont remember what this is suposed to do but ima keep it
 				{
 					Vector3 leftP1 = i >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
                     Vector3 rightP1 = i + 1 >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i + 1];
@@ -141,28 +141,38 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 curves[i + 1] = new CubicBezierCurve(rightP1, leftP2, rightP1 + p1RightPush, leftP2 + p2RightPush);
             }
 
-			Vector3[] verts = new Vector3[topEndsCount * subDivision];
+            Vector3[] verts = new Vector3[topEndsCount * subDivision];
 			int[] trigs = new int[verts.Length * 6];
 
+            //add left verts to verts and know the starting index
             Vector3[] leftVert = curves[0].CurvePoints(subDivision);
+            Array.Copy(leftVert, verts, leftVert.Length);
+            int leftEdgeStart = 0;
+
+            //add right verts to verts remember start index
             Vector3[] rightVert = curves[1].CurvePoints(subDivision);
+            Array.Copy(rightVert, 0, verts, leftVert.Length, leftVert.Length);
+            int rightEdgeStart = leftVert.Length;
 
-            int ri = leftVert.Length; 
-            for (int li = 0; li < leftVert.Length - 1; li++)
+            int trigI = 0;
+            for (int i = 0; i < 1; i++)
             {
-                int trigI = li * 6;
-                trigs[trigI] = li;
-                trigs[trigI + 1] = li + 1;
-                trigs[trigI + 2] = ri;
-                trigs[trigI + 3] = ri;
-                trigs[trigI + 4] = li + 1;
-                trigs[trigI + 5] = ri + 1;
+                int ri = rightEdgeStart; 
+                for (int li = leftEdgeStart; li < rightEdgeStart - 1; li++)
+                {
+                    trigs[trigI] = li;
+                    trigs[trigI + 1] = li + 1;
+                    trigs[trigI + 2] = ri;
+                    trigs[trigI + 3] = ri;
+                    trigs[trigI + 4] = li + 1;
+                    trigs[trigI + 5] = ri + 1;
+                    trigI += 6;
 
-                ri++;
+                    ri++;
+                }
             }
 
-            Array.Copy(leftVert, verts, leftVert.Length);
-            Array.Copy(rightVert, 0, verts, leftVert.Length, leftVert.Length);
+            
 
 			Mesh mesh = new Mesh();
             mesh.vertices = verts;

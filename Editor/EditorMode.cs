@@ -12,26 +12,45 @@ namespace DecentlyGoodStreetBuilder.Editor
 	public class EditorMode : EditorToolContext
 	{
 		public static StreetBuilder streetBuilder;
-		
-		public static void AddNode()
-		{
-            Node node = CreateInstance<Node>();
-			node.Init(Vector3.zero, streetBuilder);
+
+        public override void OnActivated()
+        {
+            base.OnActivated();
+
+			streetBuilder = (StreetBuilder)target;
+			Selection.activeObject = streetBuilder.gameObject;
         }
+
+		public override void OnWillBeDeactivated()
+		{
+			base.OnWillBeDeactivated();
+			streetBuilder = null;
+			ToolManager.RestorePreviousPersistentTool();
+		}
 
 		public override void OnToolGUI(EditorWindow _) 
 		{
             if (streetBuilder == null) DestroyImmediate(this);
 			
-            //locks the GameObject
-            Selection.objects = new UnityEngine.Object[] { ((StreetBuilder)target).gameObject };
+			HandleUtility.AddDefaultControl(
+				GUIUtility.GetControlID(FocusType.Passive)
+			);
 
-			streetBuilder = ((StreetBuilder)target).gameObject.GetComponent<StreetBuilder>();
+			if (streetBuilder != null && Selection.activeObject != streetBuilder.gameObject)
+			{
+				Selection.activeObject = streetBuilder.gameObject;
+			}
         }
 
         public override void PopulateMenu(DropdownMenu menu)
         {
             menu.AppendAction("Create Node", (item) => AddNode());
+        }
+
+		public static void AddNode()
+		{
+            Node node = CreateInstance<Node>();
+			node.Init(Vector3.zero, streetBuilder);
         }
 
         protected override Type GetEditorToolType(Tool tool)

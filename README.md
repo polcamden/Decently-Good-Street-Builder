@@ -53,8 +53,3 @@ This UML diagram needs to be remade, but it gives an outline.
 <a href="https://github.com/polcamden/Decently-Good-Street-Builder">
     <img src="Images/Readme/UML.png" alt="UML Diagram">
   </a>
-
-## License
-Camden - email@example.com
-
-## Contact

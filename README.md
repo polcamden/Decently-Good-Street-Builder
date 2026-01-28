@@ -38,12 +38,12 @@ Decently Good Street Builder (DGSB) is a package for Unity 6 that allows for roa
 
 ## Getting Started
 ### Installation
-Todo
-### Getting Started
-#### Set Up
+ - To install Decently Good Street Builder open the Unity package manager by top menu -> Window -> Package Management -> Package Manager. Within the package manager click the + in the top left and select "Install package from git URL" paste the URL in the text box "github.com/polcamden/Decently-Good-Street-Builder".
+ - DGSB uses roadway assets to generate roads. Add the asset pack into the files of your project TODO: add link to asset packs
+### Set Up
 - To Start using Decently Good Street Builder create a street builder object in the top menu GameObject -> StreetBuilder, This creates an empty object with a StreetBuilder script. 
 - To use roadway assets first create a Asset Library window in the top menu Tools -> Decently Good Street Builder -> Asset Library, mount the window anywhere perferably under the inspector. in the settings of the Asset Library copy the path of where your roadway assets are into the list of asset paths. Reload to show the assets in the window. 
-#### Usage
+### Usage
 - To edit the street selected the StreetBuilder object, in the scene tools menu select "Street Builder Editor Mode".
 - Within the editor mode there are two tools, move and select.
 - using the move tool right click -> Create Node will create a node at (0,0,0).

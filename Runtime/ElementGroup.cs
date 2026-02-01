@@ -53,9 +53,9 @@ namespace DecentlyGoodStreetBuilder
 
 		private void OnDestroy()
 		{
-			for (int i = Count-1; i > 0; i++)
+			for (int i = streetElements.Count - 1; i > 0; i++)
 			{
-				Destroy(streetElements[i]);
+				DestroyImmediate(streetElements[i]);
 			}
 		}
 	}

@@ -30,4 +30,9 @@ namespace DecentlyGoodStreetBuilder.Roadway
 	{
 		public abstract List<GameObject> UpdateObjects(Segment segment, RoadwayData data, List<GameObject> gameObjects);
 	}
+
+	public interface IFillMesh
+    {
+        public abstract Mesh GenerateMesh();
+    }
 }

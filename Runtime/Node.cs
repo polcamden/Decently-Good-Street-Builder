@@ -159,9 +159,9 @@ namespace DecentlyGoodStreetBuilder
 
 				Material[] materials;
 
-                (mesh, materials) = NodeType.GenerateRoadwayMesh(mesh);
+                materials = NodeType.GenerateRoadwayMesh(mesh);
 
-				GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+				//GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
 				GameObject.GetComponent<MeshRenderer>().materials = materials;
 			}
 		}
@@ -170,7 +170,6 @@ namespace DecentlyGoodStreetBuilder
         {
             for (int i = 0; i < ConnectionCount; i++)
             {
-                Debug.Log(i + " destroy");
                 DestroyImmediate(connectionLinks[i]);
             }
 

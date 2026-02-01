@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
 using DecentlyGoodStreetBuilder.Roadway;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace DecentlyGoodStreetBuilder.NodeTypes
 {
@@ -50,9 +48,9 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 if(p1World != null && p2World != null)
                 {
                     Vector3 p1LeftMid = p1World[0];
-                    Vector3 p1RightMid = p1World[1];
-                    Vector3 p2LeftMid = p2World[1];
-                    Vector3 p2RightMid = p2World[0];
+                    Vector3 p1RightMid = p1World[p1World.Length - 1];
+                    Vector3 p2LeftMid = p2World[0];
+                    Vector3 p2RightMid = p2World[p2World.Length - 1];
 
                     Handles.DrawDottedLine(p1LeftMid, p2LeftMid, 2);
                     Handles.DrawDottedLine(p1RightMid, p2RightMid, 2);
@@ -67,22 +65,26 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
 				CubicBezierCurve[] curves = new CubicBezierCurve[4];
 
-				Vector3 p1LeftPush = GetEndingNormal(0) * mergeDistance * leftTransition;
-				Vector3 p1RightPush = GetEndingNormal(0) * mergeDistance * rightTransition;
-				Vector3 p2LeftPush = GetEndingNormal(1) * mergeDistance * (1 - leftTransition);
-				Vector3 p2RightPush = GetEndingNormal(1) * mergeDistance * (1 - rightTransition);
+                int topEndsCount = Mathf.Max(p1Ends.Length, p2Ends.Length);
+                for (int i = 0; i < topEndsCount; i++)
+                {
+                    int a = i * p1Ends.Length / topEndsCount;
+                    int b = i * p2Ends.Length / topEndsCount;
 
-				for (int i = 0; i < 4; i += 2) //TODO: I dont remember what this is suposed to do but ima keep it
-				{
-					Vector3 leftP1 = i >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
-                    Vector3 rightP1 = i + 1 >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i + 1];
+                    Vector3 p1 = p1Ends[a];
+                    Vector3 p2 = p2Ends[b];
 
-					Vector3 leftP2 = i >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
-					Vector3 rightP2 = i + 1 >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
+                    float side = leftTransition;
+                    if (i > topEndsCount / 2)
+                    {
+                        side = rightTransition;
+                    }
 
-					curves[i] = new CubicBezierCurve(leftP1, rightP2, leftP1 + p1LeftPush, rightP2 + p2LeftPush);
-					curves[i + 1] = new CubicBezierCurve(rightP1, leftP2, rightP1 + p1RightPush, leftP2 + p2RightPush);
-				}
+                    Vector3 p1Handle = p1 + GetEndingNormal(0) * mergeDistance * side;
+				    Vector3 p2Handle = p2 + GetEndingNormal(1) * mergeDistance * (1 - side);
+
+                    curves[i] = new CubicBezierCurve(p1, p2, p1Handle, p2Handle);
+                }
 
                 for (int i = 0; i < curves.Length; i++)
                 {
@@ -113,39 +115,64 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 				p2Ends[i] = p2Ends[i] - nodePos;
 			}
 
-            int topEndsCount = 4;
-            if (p1Ends.Length == 2 && p2Ends.Length == 2)
-            {
-                topEndsCount = 2;
-            }
+            int topEndsCount = Mathf.Max(p1Ends.Length, p2Ends.Length);
 
             //make curves between endPoints
             CubicBezierCurve[] curves = new CubicBezierCurve[topEndsCount];
-			Segment s1 = MyNode.GetConnectionLink(0);
-			Segment s2 = MyNode.GetConnectionLink(1);
-
-			Vector3 p1LeftPush = GetEndingNormal(0) * mergeDistance * leftTransition;
-            Vector3 p1RightPush = GetEndingNormal(0) * mergeDistance * rightTransition;
-            Vector3 p2LeftPush = GetEndingNormal(1) * mergeDistance * (1 - leftTransition);
-            Vector3 p2RightPush = GetEndingNormal(1) * mergeDistance * (1 - rightTransition);
-
-			for (int i = 0; i < curves.Length; i+=2)
+			
+            for (int i = 0; i < topEndsCount; i++)
             {
-                Vector3 leftP1 = i >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i];
-                Vector3 rightP1 = i + 1 >= p1Ends.Length ? p1Ends[p1Ends.Length - 1] : p1Ends[i + 1];
+                int a = i * p1Ends.Length / topEndsCount;
+                int b = i * p2Ends.Length / topEndsCount;
 
-                Vector3 leftP2 = i >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i];
-                Vector3 rightP2 = i + 1 >= p2Ends.Length ? p2Ends[p1Ends.Length - 1] : p2Ends[i + 1];
+                Vector3 p1 = p1Ends[a];
+                Vector3 p2 = p2Ends[b];
 
-                curves[i] = new CubicBezierCurve(leftP1, rightP2, leftP1 + p1LeftPush, rightP2 + p2LeftPush);
-                curves[i + 1] = new CubicBezierCurve(rightP1, leftP2, rightP1 + p1RightPush, leftP2 + p2RightPush);
+                float side = leftTransition;
+                if (i > topEndsCount / 2)
+                {
+                    side = rightTransition;
+                }
+
+                Vector3 p1Handle = p1 + GetEndingNormal(0) * mergeDistance * side;
+                Vector3 p2Handle = p2 + GetEndingNormal(1) * mergeDistance * (1 - side);
+
+                curves[i] = new CubicBezierCurve(p1, p2, p1Handle, p2Handle);
             }
+
 
             Vector3[] verts = new Vector3[topEndsCount * subDivision];
 			int[] trigs = new int[verts.Length * 6];
 
+            //add verts for each bezier curve
+            for (int i = 0; i < curves.Length; i++)
+            {
+                Vector3[] curveVerts = curves[i].CurvePoints(subDivision);
+                Array.Copy(curveVerts, 0, verts, i * subDivision, subDivision);
+            }
+
+            int trigI = 0;
+            for (int i = 1; i < curves.Length; i++)
+            {
+                int ri = i * subDivision;
+                for (int li = (i - 1) * subDivision; li < i * subDivision - 1; li++)
+                {
+                    trigs[trigI] = li;
+                    trigs[trigI + 1] = ri;
+                    trigs[trigI + 2] = li + 1;
+                    
+                    trigs[trigI + 3] = ri;
+                    trigs[trigI + 4] = ri + 1;
+                    trigs[trigI + 5] = li + 1;
+                    
+                    trigI += 6;
+
+                    ri++;
+                }
+            }
+
             //add left verts to verts and know the starting index
-            Vector3[] leftVert = curves[0].CurvePoints(subDivision);
+            /*Vector3[] leftVert = curves[0].CurvePoints(subDivision);
             Array.Copy(leftVert, verts, leftVert.Length);
             int leftEdgeStart = 0;
 
@@ -161,18 +188,18 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 for (int li = leftEdgeStart; li < rightEdgeStart - 1; li++)
                 {
                     trigs[trigI] = li;
-                    trigs[trigI + 1] = li + 1;
-                    trigs[trigI + 2] = ri;
+                    trigs[trigI + 1] = ri;
+                    trigs[trigI + 2] = li + 1;
+                    
                     trigs[trigI + 3] = ri;
-                    trigs[trigI + 4] = li + 1;
-                    trigs[trigI + 5] = ri + 1;
+                    trigs[trigI + 4] = ri + 1;
+                    trigs[trigI + 5] = li + 1;
+                    
                     trigI += 6;
 
                     ri++;
                 }
-            }
-
-            
+            }*/
 
 			Mesh mesh = new Mesh();
             mesh.vertices = verts;
@@ -248,12 +275,14 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                     Vector3[] points = GeometryF.Vector2sToPlane(endPointsPlane, transform);
 
                     //flips order
-                    for (int i = 0; i < points.Length; i += 2)
+                    Vector3 pos = MyNode.Position;
+                    float d1 = Vector3.Dot(pos, points[0]);
+                    float d2 = Vector3.Dot(pos, points[points.Length-1]);
+                    if (d1 < d2)
                     {
-                        Vector3 temp = points[i];
-                        points[i] = points[i + 1];
-                        points[i + 1] = temp;
+                        Array.Reverse(points);
                     }
+
 
                     return points;
 				}

@@ -88,34 +88,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			return null;
 		}
 
-		/*public void UpdateSegmentsRoadway(Segment segment, Mesh mesh, Dictionary<RoadwayData, List<GameObject>> dataToGameobjects)
-		{
-			bool[] exists = new bool[dataToGameobjects.Count];
-			int existsIndex = 0;
-
-			for (int i = 0; i < Count; i++)
-            {
-				if (GetPart(i).GetType().GetInterface(nameof(IRoadwayObjects)) != null)
-				{
-					RoadwayData data = GetData(i);
-
-					if (dataToGameobjects.ContainsKey(data))
-					{
-						exists[existsIndex] = true;
-						
-					}
-					else
-					{
-						exists[existsIndex] = false;
-					}
-
-                    existsIndex++;
-				}
-			}
-		}*/
-
-
-		public (Mesh, Material[]) GenerateRoadwayMesh(Segment segment, Mesh mesh)
+		public Material[] GenerateRoadwayMesh(Segment segment, Mesh mesh)
 		{
 			CubicBezierCurve baseCurve = segment.ToBezierCurve();
 
@@ -145,7 +118,7 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			mesh.RecalculateBounds();
 			mesh.Optimize();
 
-            return (mesh, materials.ToArray());
+            return materials.ToArray();
         }
 		
 		public void UpdateGameObjects(Segment segment, Dictionary<RoadwayData, List<GameObject>> gameObjects)

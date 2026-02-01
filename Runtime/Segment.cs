@@ -367,9 +367,7 @@ namespace DecentlyGoodStreetBuilder
 
                 Material[] materials;
 
-                (mesh, materials) = roadway.GenerateRoadwayMesh(this, mesh);
-
-                GameObject.GetComponent<MeshFilter>().sharedMesh = mesh;
+                materials = roadway.GenerateRoadwayMesh(this, mesh);
                 GameObject.GetComponent<MeshRenderer>().materials = materials;
             }
         }

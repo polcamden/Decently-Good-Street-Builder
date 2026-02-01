@@ -9,6 +9,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         [SerializeField] private Node myNode;
         [SerializeField] private Material surfaceMaterial;
 
+        //[SerializeField] 
+
         public Node MyNode
         {
             get {  return myNode; }
@@ -28,7 +30,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         /// </summary>
         /// <param name="mesh">MyNodes mesh</param>
         /// <returns></returns>
-        public (Mesh, Material[]) GenerateRoadwayMesh(Mesh mesh)
+        public Material[] GenerateRoadwayMesh(Mesh mesh)
         {
             //TODO: add roadway list structure
             mesh.Clear();
@@ -42,7 +44,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
 			Material[] materials = new Material[] { surfaceMaterial };
 
-            return (mesh, materials);
+            return materials;
         }
 
 		/// <summary>

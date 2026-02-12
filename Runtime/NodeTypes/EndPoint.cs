@@ -20,6 +20,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public override void HandleUpdate()
         {
+            base.HandleUpdate();
+
 			if (MyNode.ConnectionCount != 1)
 			{
 				Debug.LogError("EndPoint is being used on a node that doesn't have 1 connections");

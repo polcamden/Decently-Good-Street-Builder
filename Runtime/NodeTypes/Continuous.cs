@@ -140,7 +140,6 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                 curves[i] = new CubicBezierCurve(p1, p2, p1Handle, p2Handle);
             }
 
-
             Vector3[] verts = new Vector3[topEndsCount * subDivision];
 			int[] trigs = new int[verts.Length * 6];
 
@@ -170,6 +169,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
                     ri++;
                 }
             }
+
+            //Debug.Log("build");
 
             //add left verts to verts and know the starting index
             /*Vector3[] leftVert = curves[0].CurvePoints(subDivision);
@@ -211,6 +212,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public override void HandleUpdate()
         {
+            base.HandleUpdate();
+
             if (MyNode.ConnectionCount != 2)
             {
 				Debug.LogError("Continuous is being used on a node that doesn't have 2 connections");

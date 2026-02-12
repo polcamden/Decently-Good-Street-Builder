@@ -22,6 +22,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
         public override void HandleUpdate()
         {
+            base.HandleUpdate();
+
             if (MyNode.ConnectionCount < 3)
             {
                 Debug.LogError("Intersection is being used on a node that doesn't have 3 or more connections");

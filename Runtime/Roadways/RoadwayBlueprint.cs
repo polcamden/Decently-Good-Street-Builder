@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using NUnit.Framework;
 using Unity.VisualScripting;
@@ -141,5 +142,21 @@ namespace DecentlyGoodStreetBuilder.Roadway
                 }
             }*/
         }
+
+		public long getId()
+		{
+			string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
+
+			long id = 420691334;
+			unchecked
+			{
+				foreach(char c in guid)
+				{
+					id = id * 32 + c;
+				}
+			}
+
+			return id;
+		}
 	}
 }

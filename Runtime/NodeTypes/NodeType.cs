@@ -1,5 +1,7 @@
 using System;
-using Unity.VisualScripting;
+using System.Collections.Generic;
+using System.IO;
+using DecentlyGoodStreetBuilder.Roadway;
 using UnityEngine;
 
 namespace DecentlyGoodStreetBuilder.NodeTypes
@@ -11,8 +13,9 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         [SerializeField] private Material surfaceMaterial;
 
         [SerializeField] private long connectionId;
-        //[SerializeField] private Tuple<>
-
+        [SerializeField] private List<NodeLineConnection> PartConnections = new List<NodeLineConnection>();
+        [SerializeField] private List<NodeFillConnection> FillConnections= new List<NodeFillConnection>();
+        
         public Node MyNode
         {
             get {  return myNode; }
@@ -155,5 +158,59 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
             connectionId = finalId;
         }
+    
+        /*private void defaultFill()
+        {
+            RoadwayPart part = myNode.GetConnectionLink(0).Roadway.FindPartByType(typeof(CarriagewayMesh));
+
+            List<Tuple<Segment, Vector3, Vector3>> relativePositions = new List<Tuple<Segment, Vector3, Vector3>>();
+
+            for (int i = 0; i < myNode.ConnectionCount; i++)
+            {
+                Segment s = myNode.GetConnectionLink(i);
+                CarriagewayMeshData data = (CarriagewayMeshData)s.Roadway.FindDataByType(typeof(CarriagewayMeshData));
+                Vector3 l = Vector3.left;
+                Vector3 r = Vector3.right;
+                if(data != null)
+                {
+                    l *= data.width / 2;
+                    r *= -data.width / 2;
+                }
+
+                Tuple<Segment, Vector3, Vector3> tuple = new Tuple<Segment, Vector3, Vector3>(s, l, r);
+
+                relativePositions.Add(tuple);
+            }  
+
+            //NodeFillConnection fill = new NodeFillConnection(relativePositions, part, );
+
+            //PartConnections.Add();
+        }*/
+    }
+
+    public class NodeLineConnection
+    {
+        Tuple<int, Vector3> connection1;
+        Tuple<int, Vector3> connection2;
+        
+        RoadwayPart part;
+        RoadwayData data;
+    }
+
+    /// <summary>
+    /// Fills area
+    /// </summary>
+    public class NodeFillConnection
+    {
+        List<Tuple<int, Vector3>> connections;
+
+        RoadwayPart part;
+        RoadwayData data;
+    }
+
+    public enum ConnectionRelationship
+    {
+        relative,
+        absolute,
     }
 }

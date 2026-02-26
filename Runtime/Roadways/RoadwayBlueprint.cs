@@ -89,6 +89,19 @@ namespace DecentlyGoodStreetBuilder.Roadway
 			return null;
 		}
 
+		public RoadwayPart FindPartByType(Type type)
+		{
+			for (int i = 0; i < parts.Count; i++)
+			{
+				if(parts[i].GetType() == type)
+				{
+					return parts[i];
+				}
+			}
+			
+			return null;
+		}
+
 		public Material[] GenerateRoadwayMesh(Segment segment, Mesh mesh)
 		{
 			CubicBezierCurve baseCurve = segment.ToBezierCurve();

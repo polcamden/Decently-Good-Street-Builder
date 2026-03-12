@@ -10,7 +10,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     {
         public override void Draw(string[] args)
         {
-            
+            base.Draw(args);
         }
 
         public override Mesh GenerateSurfaceMesh()

@@ -23,6 +23,8 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
 		public override void Draw(string[] args)
         {
+            base.Draw(args);
+
             if (!args.Contains<string>("selected"))
                 return;
 

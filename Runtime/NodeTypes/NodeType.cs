@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using DecentlyGoodStreetBuilder.Roadway;
 using UnityEngine;
 
@@ -15,7 +14,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         [SerializeField] private long connectionId;
         [SerializeField] private List<NodeLineConnection> PartConnections = new List<NodeLineConnection>();
         [SerializeField] private List<NodeFillConnection> FillConnections= new List<NodeFillConnection>();
-        
+
         public Node MyNode
         {
             get {  return myNode; }
@@ -26,13 +25,23 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 			this.myNode = myNode;
 		}
 
-        public abstract void Draw(string[] args);
+        public virtual void Draw(string[] args)
+        {
+            (Vector3[] endPoint, Matrix4x4[] transforms) = GetRelativeEnding();
+
+            for (int i = 0; i < PartConnections.Count; i++)
+            {
+                PartConnections[i].Draw(MyNode.Position, endPoint, transforms);
+            }
+        }
 
         public virtual void HandleUpdate()
         {
             if(myNode.ConnectionCount != 0)
                 SetConnectionHash();
             //TODO: search saved connections and auto load the connections
+
+            UpdateConnectionsHandles();
         }
 
         /// <summary>
@@ -158,7 +167,36 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
 
             connectionId = finalId;
         }
-    
+
+        private void UpdateConnectionsHandles()
+        {
+            
+
+            /*for (int i = 0; i < PartConnections.Count; i++)
+            {
+                PartConnections[i].UpdateConnectionsHandles();
+            }*/
+        }
+
+        /// <summary>
+        /// returns the (endPoints[], endTransforms[]) of all endpoints going into myNode
+        /// </summary>
+        /// <returns></returns>
+        private (Vector3[] ,Matrix4x4[]) GetRelativeEnding()
+        {
+            Vector3[] endpoints = new Vector3[MyNode.ConnectionCount];
+            Matrix4x4[] transforms = new Matrix4x4[MyNode.ConnectionCount];
+            Vector3 worldPos = MyNode.Position;
+            for (int i = 0; i < endpoints.Length; i++)
+            {
+                Segment s = myNode.GetConnectionLink(i);
+                endpoints[i] = s.GetEndPointsRelativeToNode(MyNode);
+                transforms[i] = s.GetEndpointTransformMatrix(myNode);
+            }
+
+            return (endpoints, transforms);
+        }
+
         /*private void defaultFill()
         {
             RoadwayPart part = myNode.GetConnectionLink(0).Roadway.FindPartByType(typeof(CarriagewayMesh));
@@ -188,13 +226,70 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
         }*/
     }
 
+    [System.Serializable]
     public class NodeLineConnection
     {
-        Tuple<int, Vector3> connection1;
-        Tuple<int, Vector3> connection2;
-        
-        RoadwayPart part;
-        RoadwayData data;
+        [SerializeField] Tuple<int, Vector3>[] connections; // connection index, offset relative to end Matrix4x4
+        [SerializeField] Vector3[] handles; // handle of curve relative to connection
+        [SerializeField] bool autoHandle;
+        [SerializeField] [Range(0f, 1f)] float autoHardness; // 0-1 
+        [SerializeField] RoadwayPart part;
+        [SerializeField] RoadwayData data;
+
+        public NodeLineConnection(Tuple<int, Vector3> connection1, Tuple<int, Vector3> connection2, RoadwayPart part, RoadwayData data)
+        {
+            connections = new Tuple<int, Vector3>[] {connection1, connection2};
+            autoHandle = true;
+            this.part = part;
+            this.data = data;
+        }
+
+        public void Draw(Vector3 nodePosition, Vector3[] endPoints, Matrix4x4[] endMatrix)
+        {
+            if (connections == null || connections.Length != 2)
+            {
+                return;
+            }
+
+            Vector3 s1 = connectionPoint(connections[0].Item2, endPoints[connections[0].Item1], endMatrix[connections[0].Item1]) + nodePosition;
+            Vector3 s2 = connectionPoint(connections[1].Item2, endPoints[connections[1].Item1], endMatrix[connections[1].Item1]) + nodePosition;
+            Vector3 h1 = s1 + handles[0] + nodePosition;
+            Vector3 h2 = s2 + handles[1] + nodePosition;
+
+            CubicBezierCurve curve = new CubicBezierCurve(s1, s2, h1, h2);
+
+            curve.DrawUnityBezier(Color.blue);
+        }
+
+        public void HandleUpdate(Vector3[] endPoints, Matrix4x4[] endMatrix)
+        {
+            if (autoHandle)
+            {
+                Vector3 intersection;
+                Vector3 s1 = connectionPoint(connections[0].Item2, endPoints[connections[0].Item1], endMatrix[connections[0].Item1]);
+                Vector3 s2 = connectionPoint(connections[1].Item2, endPoints[connections[1].Item1], endMatrix[connections[1].Item1]);
+                Vector3 dir1 = endMatrix[connections[0].Item1].MultiplyPoint(Vector3.forward);
+                Vector3 dir2 = endMatrix[connections[2].Item1].MultiplyPoint(Vector3.forward);
+                if(GeometryF.Vector3Intersection(out intersection, s1, dir1, s2, dir2))
+                {
+                    float dist1 = Vector3.Distance(s1, s2) * autoHardness;
+                    float dist2 = Vector3.Distance(s1, s2) * autoHardness;
+                    handles[0] = dir1 * dist1;
+                    handles[1] = dir2 * dist2;
+                }
+                else
+                {
+                    float dist = Vector3.Distance(s1, s2) * autoHardness;
+                    handles[0] = dir1 * dist;
+                    handles[1] = dir2 * dist;
+                }
+            }
+        }
+
+        private Vector3 connectionPoint(Vector3 offset, Vector3 endPoint, Matrix4x4 endMatrix)
+        {
+            return endPoint + endMatrix.MultiplyPoint(offset);
+        }
     }
 
     /// <summary>
@@ -203,14 +298,7 @@ namespace DecentlyGoodStreetBuilder.NodeTypes
     public class NodeFillConnection
     {
         List<Tuple<int, Vector3>> connections;
-
         RoadwayPart part;
         RoadwayData data;
-    }
-
-    public enum ConnectionRelationship
-    {
-        relative,
-        absolute,
     }
 }

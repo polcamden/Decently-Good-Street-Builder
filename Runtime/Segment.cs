@@ -85,6 +85,12 @@ namespace DecentlyGoodStreetBuilder
             int i = node == connection[0] ? 0 : 1;
             endPoints[i] = position;
         }
+        public Matrix4x4 GetEndpointTransformMatrix(Node node)
+        {
+            Vector3 normal = (GetEndPointWorldPosition(node) - GetHandleWorldPosition(node)).normalized;
+
+            return GeometryF.OrthogonalToTransform(Vector3.zero, normal, getAngle(node));
+        }
 
         //End Point Angle
         [SerializeField] private float[] endAngles;

@@ -49,13 +49,6 @@ Decently Good Street Builder (DGSB) is a package for Unity 6 that allows for roa
 - using the move tool right click -> Create Node will create a node at (0,0,0).
 - To connect nodes us the select or move tool, shift+click both nodes to select both right click -> Connect Nodes. This creates a segment between the 2 selected nodes.
 - To assign a roadway asset to the segment select the segment using the select tool. In the asset library window press use. 
-### Custom Road Parts
-Todo
-### Custom Roadways
-Todo
-
-## Roadmap
-
 ## Technical
 This UML diagram needs to be remade, but it gives an outline. 
 <a href="https://github.com/polcamden/Decently-Good-Street-Builder">
